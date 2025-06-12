@@ -1,0 +1,4 @@
+deployment:
+  tasks:
+    - export DEPLOYROOT=/home/invers26/public_html/inversioneshoffmann/miarchivo
+    - /bin/cp -R * $DEPLOYROOT 
