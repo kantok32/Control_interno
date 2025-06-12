@@ -1,0 +1,381 @@
+/* --- GUÍA DE ESTILO --- */
+/*
+- Paleta de Colores Principal -
+Acento: #3498db
+Fondo Sidebar: #34495E (Azul oscuro desaturado)
+Fondo Sidebar Activo: #4A6572 (Tono más claro para hover/activo)
+Texto Sidebar: #F5F7FA (Texto más claro para mejor contraste)
+*/
+
+/* --- RESET Y ESTILOS GLOBALES --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #ffffff;
+    color: #333333;
+    font-size: 16px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+/* --- ESTRUCTURA PRINCIPAL (LAYOUT) --- */
+.container {
+    display: flex;
+}
+
+.sidebar {
+    width: 15%; /* Ancho Reducido */
+    min-width: 220px;
+    background-color: #111111; /* Color Negro */
+    color: #F5F7FA;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.main-content {
+    margin-left: 15%; /* Ajustado al nuevo ancho de la sidebar */
+    width: 85%;      /* Ancho restante */
+    padding: 2rem 3rem;
+    background-color: #ffffff;
+}
+
+/* --- BARRA DE NAVEGACIÓN LATERAL (SIDEBAR) --- */
+.sidebar-header {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid #333; /* Borde más oscuro */
+}
+
+.sidebar-logo {
+    max-width: 80%;
+    height: auto;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.sidebar-nav ul {
+    margin-top: 1.5rem;
+}
+
+.sidebar-nav li a {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #bdc3c7;
+    transition: background-color 0.3s, color 0.3s;
+    position: relative;
+}
+
+.sidebar-nav li a:hover {
+    background-color: #282828; /* Gris oscuro para hover */
+    color: #ffffff;
+}
+
+.sidebar-nav li a.active {
+    background-color: #282828; /* Gris oscuro para activo */
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.sidebar-nav li a.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 5px;
+    background-color: #3498db;
+}
+
+.sidebar-nav li a i {
+    margin-right: 1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-nav .arrow {
+    margin-left: auto;
+    font-size: 0.8rem;
+    transition: transform 0.3s;
+}
+
+/* --- CONTENIDO PRINCIPAL --- */
+/* Cabecera */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.main-header h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-weight: 500;
+}
+
+.user-profile .email {
+    color: #95a5a6;
+}
+
+.user-profile .logout-icon {
+    font-size: 1.5rem;
+    color: #95a5a6;
+    transition: color 0.3s;
+}
+.user-profile .logout-icon:hover {
+    color: #3498db;
+}
+
+/* Barra de Herramientas y Filtros */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.search-bar {
+    position: relative;
+    flex-grow: 1;
+    max-width: 400px;
+}
+
+.search-bar i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #95a5a6;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border: 1px solid #ecf0f1;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #333333;
+}
+.search-bar input::placeholder {
+    color: #95a5a6;
+}
+
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.filters label {
+    font-weight: 500;
+    margin-right: -0.5rem;
+}
+
+.filters select {
+    padding: 0.8rem 1rem;
+    border: 1px solid #ecf0f1;
+    border-radius: 4px;
+    color: #95a5a6;
+    background-color: #ffffff;
+    min-width: 200px;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-outline {
+    background-color: #ffffff;
+    border: 1px solid #3498db;
+    color: #3498db;
+}
+.btn-outline:hover {
+    background-color: #3498db;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Tabla de Datos */
+.table-info {
+    margin-bottom: 1rem;
+    color: #95a5a6;
+    font-size: 0.9rem;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.data-table th, .data-table td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.data-table thead {
+    background-color: #f2f2f2;
+}
+
+.data-table th {
+    font-weight: 700;
+    color: #333333;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid #ecf0f1;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.data-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.data-table td {
+    color: #333333;
+    font-size: 0.95rem;
+}
+
+/* Estilos para los Badges de Estado */
+.status-badge {
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.status-activo {
+    background-color: #27ae60; /* Verde */
+}
+
+.status-badge.status-en-espera {
+    background-color: #f39c12; /* Naranja */
+}
+
+.status-badge.status-cerrado {
+    background-color: #95a5a6; /* Gris */
+}
+
+.data-table td:nth-child(3) { /* Columna Descripción */
+    max-width: 300px;
+}
+
+.data-table .icon-info { color: #3498db; font-size: 1.2rem; }
+.data-table .icon-options { color: #95a5a6; font-size: 1.2rem; }
+
+.action-icons {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 1.1rem;
+}
+.action-icons i {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.action-icons i:active {
+    transform: scale(0.90);
+}
+
+.action-icons .icon-edit:hover { color: #f39c12; transform: scale(1.1); }
+.action-icons .icon-copy:hover { color: #3498db; transform: scale(1.1); }
+.action-icons .icon-delete:hover { color: #e74c3c; transform: scale(1.1); }
+
+/* Botón de Acción Flotante (FAB) */
+.fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    background-color: #3498db;
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.fab:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Placeholder para contenido de página vacía */
+.content-placeholder {
+    text-align: center;
+    padding: 4rem;
+    border: 2px dashed #ecf0f1;
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+.content-placeholder h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.content-placeholder p {
+    color: #95a5a6;
+}
