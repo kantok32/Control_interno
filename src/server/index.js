@@ -110,6 +110,7 @@ app.get('/api/casos', async (req, res) => {
         c.fecha_nacimiento,
         c.rut,
         c.correo_electronico,
+        c.telefono,
         c.domicilio,
         c.tipo_asesoria,
         c.situacion_legal,
@@ -139,6 +140,7 @@ app.post('/api/casos', async (req, res) => {
       fecha_nacimiento,
       rut,
       correo_electronico,
+      telefono,
       domicilio,
       tipo_asesoria,
       situacion_legal,
@@ -157,6 +159,7 @@ app.post('/api/casos', async (req, res) => {
       fecha_nacimiento: 'Fecha de nacimiento',
       rut: 'RUT',
       correo_electronico: 'Correo electrónico',
+      telefono: 'Teléfono',
       domicilio: 'Domicilio',
       tipo_asesoria: 'Tipo de asesoría',
       motivo_consulta: 'Motivo de consulta',
@@ -198,6 +201,7 @@ app.post('/api/casos', async (req, res) => {
         fecha_nacimiento,
         rut,
         correo_electronico,
+        telefono,
         domicilio,
         tipo_asesoria,
         situacion_legal,
@@ -210,7 +214,7 @@ app.post('/api/casos', async (req, res) => {
         estado,
         fecha_apertura
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const [result] = await pool.query(sql, [
@@ -218,6 +222,7 @@ app.post('/api/casos', async (req, res) => {
       fecha_nacimiento,
       rutLimpio,
       correo_electronico,
+      telefono,
       domicilio,
       tipo_asesoria,
       situacion_legal,
@@ -311,6 +316,144 @@ app.get('/api/casos/:id', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener caso:', error);
     res.status(500).json({ error: 'Error al obtener el caso' });
+  }
+});
+
+// Actualizar un caso existente
+app.put('/api/casos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      nombre_completo,
+      fecha_nacimiento,
+      rut,
+      correo_electronico,
+      telefono,
+      domicilio,
+      tipo_asesoria,
+      situacion_legal,
+      motivo_consulta,
+      motivo_consulta_otro,
+      descripcion_asunto,
+      antecedentes_penales,
+      abogado,
+      prioridad,
+      estado
+    } = req.body;
+
+    // Validar campos requeridos
+    const camposRequeridos = {
+      nombre_completo: 'Nombre completo',
+      fecha_nacimiento: 'Fecha de nacimiento',
+      rut: 'RUT',
+      correo_electronico: 'Correo electrónico',
+      telefono: 'Teléfono',
+      domicilio: 'Domicilio',
+      tipo_asesoria: 'Tipo de asesoría',
+      motivo_consulta: 'Motivo de consulta',
+      descripcion_asunto: 'Descripción del asunto',
+      abogado: 'Abogado',
+      prioridad: 'Prioridad',
+      estado: 'Estado'
+    };
+    
+    const camposFaltantes = [];
+    for (const [campo, nombre] of Object.entries(camposRequeridos)) {
+      if (!req.body[campo] || req.body[campo].toString().trim() === '') {
+        camposFaltantes.push(nombre);
+      }
+    }
+    
+    if (camposFaltantes.length > 0) {
+      return res.status(400).json({ 
+        error: 'Campos requeridos faltantes', 
+        camposFaltantes,
+        message: `Los siguientes campos son obligatorios: ${camposFaltantes.join(', ')}`
+      });
+    }
+
+    // Limpiar el RUT
+    const rutLimpio = rut ? rut.replace(/[^0-9kK]/g, '').toUpperCase() : null;
+
+    const query = `
+      UPDATE casos 
+      SET 
+        nombre_completo = ?,
+        fecha_nacimiento = ?,
+        rut = ?,
+        correo_electronico = ?,
+        telefono = ?,
+        domicilio = ?,
+        tipo_asesoria = ?,
+        situacion_legal = ?,
+        motivo_consulta = ?,
+        motivo_consulta_otro = ?,
+        descripcion_asunto = ?,
+        antecedentes_penales = ?,
+        abogado = ?,
+        prioridad = ?,
+        estado = ?,
+        fecha_actualizacion = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await pool.query(query, [
+      nombre_completo,
+      fecha_nacimiento,
+      rutLimpio,
+      correo_electronico,
+      telefono,
+      domicilio,
+      tipo_asesoria,
+      situacion_legal ? 1 : 0,
+      motivo_consulta,
+      motivo_consulta_otro,
+      descripcion_asunto,
+      antecedentes_penales ? 1 : 0,
+      abogado,
+      prioridad,
+      estado,
+      id
+    ]);
+
+    if (!result || result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Caso no encontrado' });
+    }
+
+    // Obtener el caso actualizado con todos sus datos
+    const [casoActualizado] = await pool.query(`
+      SELECT 
+        c.*,
+        COUNT(d.id) as total_documentos,
+        MAX(d.fecha_creacion) as ultimo_documento
+      FROM casos c
+      LEFT JOIN documentos d ON c.id = d.caso_id
+      WHERE c.id = ?
+      GROUP BY 
+        c.id, 
+        c.nombre_completo,
+        c.fecha_nacimiento,
+        c.rut,
+        c.correo_electronico,
+        c.telefono,
+        c.domicilio,
+        c.tipo_asesoria,
+        c.situacion_legal,
+        c.motivo_consulta,
+        c.motivo_consulta_otro,
+        c.descripcion_asunto,
+        c.antecedentes_penales,
+        c.abogado,
+        c.fecha_apertura,
+        c.fecha_actualizacion,
+        c.prioridad,
+        c.estado
+    `, [id]);
+
+    res.json(casoActualizado[0]);
+  } catch (error) {
+    console.error('Error al actualizar caso:', error);
+    res.status(500).json({ error: 'Error al actualizar el caso' });
   }
 });
 
@@ -754,6 +897,7 @@ app.post('/api/casos/crear', upload.array('archivos'), async (req, res) => {
       fecha_nacimiento,
       rut,
       correo_electronico,
+      telefono,
       domicilio,
       tipo_asesoria,
       situacion_legal,
@@ -772,6 +916,7 @@ app.post('/api/casos/crear', upload.array('archivos'), async (req, res) => {
       fecha_nacimiento: 'Fecha de nacimiento',
       rut: 'RUT',
       correo_electronico: 'Correo electrónico',
+      telefono: 'Teléfono',
       domicilio: 'Domicilio',
       tipo_asesoria: 'Tipo de asesoría',
       motivo_consulta: 'Motivo de consulta',
@@ -807,6 +952,7 @@ app.post('/api/casos/crear', upload.array('archivos'), async (req, res) => {
         fecha_nacimiento,
         rut,
         correo_electronico,
+        telefono,
         domicilio,
         tipo_asesoria,
         situacion_legal,
@@ -824,6 +970,7 @@ app.post('/api/casos/crear', upload.array('archivos'), async (req, res) => {
         fecha_nacimiento,
         rutLimpio,
         correo_electronico,
+        telefono,
         domicilio,
         tipo_asesoria,
         situacion_legal,

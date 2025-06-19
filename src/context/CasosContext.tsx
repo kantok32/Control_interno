@@ -6,6 +6,7 @@ interface Caso {
   fecha_nacimiento: string;
   rut: string;
   correo_electronico: string;
+  telefono: string;
   domicilio: string;
   tipo_asesoria: string;
   situacion_legal: boolean;
@@ -70,6 +71,7 @@ export const CasosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         fecha_nacimiento: formData.get('fecha_nacimiento'),
         rut: formData.get('rut'),
         correo_electronico: formData.get('correo_electronico'),
+        telefono: formData.get('telefono'),
         domicilio: formData.get('domicilio'),
         tipo_asesoria: formData.get('tipo_asesoria'),
         situacion_legal: formData.get('situacion_legal') === 'true',
