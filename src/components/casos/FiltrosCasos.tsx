@@ -1,5 +1,6 @@
 import type { FiltrosCasos as FiltrosCasosType } from "../../hooks/useCasos";
 import "../../styles/components.css";
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   filtros: FiltrosCasosType;
@@ -9,6 +10,8 @@ interface Props {
 }
 
 export default function FiltrosCasos({ filtros, onFiltrosChange, abogados, estados }: Props) {
+  const navigate = useNavigate();
+
   return (
     <div className="filtros-container">
       <div className="search-bar">
@@ -54,7 +57,10 @@ export default function FiltrosCasos({ filtros, onFiltrosChange, abogados, estad
       </div>
 
       <div className="actions">
-        <button className="btn btn-primary">
+        <button 
+          className="btn btn-primary"
+          onClick={() => navigate('/nuevo-caso')}
+        >
           <i className="fas fa-plus"></i> Nuevo Caso
         </button>
       </div>

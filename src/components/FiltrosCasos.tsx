@@ -36,8 +36,8 @@ export const FiltrosCasos: React.FC<FiltrosCasosProps> = ({ onFilterChange }) =>
           onChange={handleChange}
         >
           <option value="TODOS">Todos</option>
-          <option value="ACTIVO">Activo</option>
-          <option value="EN ESPERA">En Espera</option>
+          <option value="CAPTACION">Captación</option>
+          <option value="EN PROCESO">En Proceso</option>
           <option value="CERRADO">Cerrado</option>
         </select>
       </div>
