@@ -1,4 +1,3 @@
-import type { Caso } from "../../hooks/useCasos";
 import FiltrosCasos from "./FiltrosCasos";
 import { useCasos } from "../../hooks/useCasos";
 import "../../styles/components.css";
@@ -10,7 +9,7 @@ export default function CasosTable() {
     filtros, 
     actualizarFiltros, 
     abogados, 
-    ESTADOS,
+    estados,
     totalCasos 
   } = useCasos();
 
@@ -22,7 +21,7 @@ export default function CasosTable() {
         filtros={filtros}
         onFiltrosChange={actualizarFiltros}
         abogados={abogados}
-        estados={ESTADOS}
+        estados={estados}
       />
 
       <div className="table-info">
@@ -51,8 +50,8 @@ export default function CasosTable() {
                 <td>{caso.asunto}</td>
                 <td>{caso.abogado}</td>
                 <td>{caso.id}</td>
-                <td>{new Date(caso.fechaApertura).toLocaleDateString()}</td>
-                <td>{new Date(caso.ultimaActualizacion).toLocaleDateString()}</td>
+                <td>{new Date(caso.fecha_apertura).toLocaleDateString()}</td>
+                <td>{new Date(caso.fecha_actualizacion).toLocaleDateString()}</td>
                 <td>
                   <span className={`prioridad-badge ${caso.prioridad.toLowerCase()}`}>
                     {caso.prioridad}

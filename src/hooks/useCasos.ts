@@ -2,13 +2,28 @@ import { useEffect, useState, useMemo } from "react";
 
 export interface Caso {
   id: string;
-  cliente: string;
-  asunto: string;
+  nombre_completo: string;
+  fecha_nacimiento: string;
+  rut: string;
+  correo_electronico: string;
+  telefono: string;
+  domicilio: string;
+  tipo_asesoria: string;
+  situacion_legal: boolean;
+  motivo_consulta: string;
+  motivo_consulta_otro?: string;
+  descripcion_asunto: string;
+  antecedentes_penales: boolean;
   abogado: string;
   prioridad: "Alta" | "Media" | "Baja";
   estado: string;
-  fechaApertura: string;
+  fecha_apertura: string;
   fecha_actualizacion: string;
+  total_documentos?: number;
+  ultimo_documento?: string;
+  cliente: string;
+  rit: string | null;
+  asunto: string;
 }
 
 export interface FiltrosCasos {
@@ -21,39 +36,48 @@ export function useCasos() {
   const [casos, setCasos] = useState<Caso[]>([]);
   const [estados, setEstados] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filtros, setFiltros] = useState<FiltrosCasos>({
     busqueda: "",
     estado: "Todos",
     abogado: "Todos"
   });
 
-  // Cargar casos y estados desde el backend
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Cargar casos
-        const responseCasos = await fetch('http://localhost:3001/api/casos');
-        if (!responseCasos.ok) throw new Error('Error al cargar casos');
-        const casosList = await responseCasos.json();
-        
-        // Cargar estados
-        const responseEstados = await fetch('http://localhost:3001/api/estados');
-        if (!responseEstados.ok) throw new Error('Error al cargar estados');
-        const estadosList = await responseEstados.json();
-        
-        setCasos(casosList.map((caso: any) => ({
-          ...caso,
-          fechaApertura: caso.fecha_apertura,
-          fecha_actualizacion: caso.fecha_actualizacion || caso.fecha_apertura
-        })));
-        setEstados(['Todos', ...estadosList.map((e: any) => e.nombre)]);
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [responseCasos, responseEstados] = await Promise.all([
+        fetch('http://localhost:3001/api/casos'),
+        fetch('http://localhost:3001/api/estados')
+      ]);
 
+      if (!responseCasos.ok) throw new Error('Error al cargar casos');
+      if (!responseEstados.ok) throw new Error('Error al cargar estados');
+      
+      const [casosList, estadosList] = await Promise.all([
+        responseCasos.json(),
+        responseEstados.json()
+      ]);
+      
+      setCasos(casosList.map((caso: any) => ({
+        ...caso,
+        cliente: caso.nombre_completo,
+        asunto: caso.descripcion_asunto,
+        fechaApertura: caso.fecha_apertura,
+        fecha_actualizacion: caso.fecha_actualizacion || caso.fecha_apertura
+      })));
+      setEstados(['Todos', ...estadosList.map((e: any) => e.nombre)]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+      console.error('Error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cargar datos iniciales
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -97,6 +121,8 @@ export function useCasos() {
   return {
     casos: casosFiltrados,
     loading,
+    error,
+    refreshCasos: fetchData,
     filtros,
     actualizarFiltros,
     abogados,

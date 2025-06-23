@@ -15,10 +15,9 @@ interface Documento {
 
 interface DocumentosManagerProps {
   casoId: string;
-  casoCliente: string;
 }
 
-const DocumentosManager: React.FC<DocumentosManagerProps> = ({ casoId, casoCliente }) => {
+const DocumentosManager: React.FC<DocumentosManagerProps> = ({ casoId }) => {
   const [documentos, setDocumentos] = useState<Documento[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

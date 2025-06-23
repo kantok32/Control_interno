@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { EditarCasoForm } from './EditarCasoForm';
+import ClienteDetalleModal from './ClienteDetalleModal';
 
 interface Caso {
   id: string;
@@ -23,6 +24,9 @@ interface Caso {
   fecha_actualizacion?: string;
   total_documentos?: number;
   ultimo_documento?: string;
+  cliente: string;
+  rit: string | null;
+  asunto: string;
 }
 
 interface CasosTableProps {
@@ -33,6 +37,8 @@ interface CasosTableProps {
 export const CasosTable: React.FC<CasosTableProps> = ({ casos, onCasoUpdated }) => {
   const navigate = useNavigate();
   const [casoEditar, setCasoEditar] = useState<Caso | null>(null);
+  const [clienteModalOpen, setClienteModalOpen] = useState(false);
+  const [clienteSeleccionado, setClienteSeleccionado] = useState<any>(null);
 
   const getPrioridadClass = (prioridad: string) => {
     const clases = {
@@ -56,10 +62,6 @@ export const CasosTable: React.FC<CasosTableProps> = ({ casos, onCasoUpdated }) 
     navigate(`/casos/${casoId}/documentos`);
   };
 
-  const handleEditarClick = (caso: Caso) => {
-    setCasoEditar(caso);
-  };
-
   const handleCloseEdit = () => {
     setCasoEditar(null);
   };
@@ -76,15 +78,20 @@ export const CasosTable: React.FC<CasosTableProps> = ({ casos, onCasoUpdated }) 
     return text.substring(0, maxLength) + '...';
   };
 
-  const formatRut = (rut: string) => {
-    if (!rut) return '-';
-    // Si el RUT tiene más de 8 caracteres, formatearlo
-    if (rut.length > 8) {
-      const numero = rut.slice(0, -1);
-      const dv = rut.slice(-1);
-      return `${numero.slice(0, -3)}.${numero.slice(-3)}-${dv}`;
+  const handleDelete = async (casoId: string) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este caso? Esta acción no se puede deshacer.')) return;
+    try {
+      const response = await fetch(`http://localhost:3001/api/casos/${casoId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        alert('Error al eliminar el caso');
+        return;
+      }
+      if (onCasoUpdated) onCasoUpdated();
+    } catch (err) {
+      alert('Error al eliminar el caso');
     }
-    return rut;
   };
 
   return (
@@ -95,7 +102,8 @@ export const CasosTable: React.FC<CasosTableProps> = ({ casos, onCasoUpdated }) 
             <tr>
               <th>N° Caso</th>
               <th>Cliente</th>
-              <th>RUT</th>
+              <th>RIT</th>
+              <th>Asunto</th>
               <th>Tipo Asesoría</th>
               <th>Motivo Consulta</th>
               <th>Abogado</th>
@@ -111,15 +119,25 @@ export const CasosTable: React.FC<CasosTableProps> = ({ casos, onCasoUpdated }) 
               <tr key={caso.id}>
                 <td>{caso.id}</td>
                 <td>
-                  <div className="cliente-info">
-                    <div className="nombre">{caso.nombre_completo}</div>
-                    <div className="contacto">
-                      <div className="email">{caso.correo_electronico}</div>
-                      {caso.telefono && <div className="telefono">{caso.telefono}</div>}
-                    </div>
-                  </div>
+                  <span
+                    className="cliente-link"
+                    style={{ cursor: 'pointer', color: '#3182ce', textDecoration: 'underline' }}
+                    onClick={() => {
+                      setClienteSeleccionado({
+                        nombre_completo: caso.nombre_completo,
+                        rut: caso.rut,
+                        fecha_nacimiento: caso.fecha_nacimiento,
+                        correo_electronico: caso.correo_electronico,
+                        telefono: caso.telefono
+                      });
+                      setClienteModalOpen(true);
+                    }}
+                  >
+                    {caso.nombre_completo}
+                  </span>
                 </td>
-                <td>{formatRut(caso.rut)}</td>
+                <td>{caso.rit || '-'}</td>
+                <td>{caso.descripcion_asunto}</td>
                 <td>{caso.tipo_asesoria}</td>
                 <td>
                   <div className="motivo-info">
@@ -153,7 +171,7 @@ export const CasosTable: React.FC<CasosTableProps> = ({ casos, onCasoUpdated }) 
                     )}
                   </div>
                 </td>
-                <td className="action-buttons">
+                <td>
                   <div className="action-icons">
                     <button 
                       className="icon-info"
@@ -162,16 +180,13 @@ export const CasosTable: React.FC<CasosTableProps> = ({ casos, onCasoUpdated }) 
                     >
                       <i className="fas fa-folder-open"></i>
                     </button>
-                    <button 
-                      className="icon-edit"
-                      title="Editar caso"
-                      onClick={() => handleEditarClick(caso)}
-                    >
+                    <Link to={`/casos/editar/${caso.id}`} className="icon-edit" title="Editar caso">
                       <i className="fas fa-pencil-alt"></i>
-                    </button>
+                    </Link>
                     <button 
                       className="icon-delete"
                       title="Eliminar caso"
+                      onClick={() => handleDelete(caso.id)}
                     >
                       <i className="fas fa-trash-alt"></i>
                     </button>
@@ -190,6 +205,12 @@ export const CasosTable: React.FC<CasosTableProps> = ({ casos, onCasoUpdated }) 
           onSave={handleSaveEdit}
         />
       )}
+
+      <ClienteDetalleModal
+        open={clienteModalOpen}
+        onClose={() => setClienteModalOpen(false)}
+        cliente={clienteSeleccionado}
+      />
     </>
   );
 }; 

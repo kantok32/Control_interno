@@ -26,7 +26,7 @@ export default function AbogadoTop({ casos }: { casos: Caso[] }) {
         ))}
       </div>
 
-      <style jsx>{`
+      <style>{`
         .dashboard-card {
           background: white;
           padding: 1.5rem;

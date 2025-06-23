@@ -25,7 +25,6 @@ const pageTransition: import('framer-motion').Transition = {
 };
 
 const Layout = () => {
-  const { logout } = useAuth();
   const location = useLocation();
 
   return (

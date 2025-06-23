@@ -314,4 +314,21 @@ router.get('/roles',
   }
 );
 
+// Obtener solo usuarios con rol ABOGADO
+router.get('/usuarios/abogados', authenticateToken, requireRole(['SUPER_ADMIN', 'ADMIN']), async (req, res) => {
+  try {
+    const [abogados] = await pool.query(`
+      SELECT u.id, u.username, u.nombre_completo 
+      FROM usuarios u
+      JOIN roles r ON u.rol_id = r.id
+      WHERE r.nombre = 'ABOGADO' AND u.activo = 1
+      ORDER BY u.nombre_completo
+    `);
+    res.json(abogados);
+  } catch (error) {
+    console.error('Error al obtener abogados:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 export default router; 

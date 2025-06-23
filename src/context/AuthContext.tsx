@@ -54,46 +54,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  // Función para hacer requests autenticados
-  const makeAuthenticatedRequest = async (url: string, options: RequestInit = {}) => {
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-      ...options.headers,
-    };
-
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
-
-    if (response.status === 401) {
-      // Token expirado, intentar refresh
-      try {
-        await refreshToken();
-        // Reintentar la request original
-        const newHeaders = {
-          'Content-Type': 'application/json',
-          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-          ...options.headers,
-        };
-        return await fetch(url, {
-          ...options,
-          headers: newHeaders,
-        });
-      } catch (error) {
-        // Refresh falló, hacer logout
-        logout();
-        throw error;
-      }
-    }
-
-    return response;
-  };
-
   // ---- Función de Login ----
   const login = async (username: string, password: string) => {
     try {
+      console.log('Enviando login:', { username, password });
       const response = await fetch('http://localhost:3001/api/auth/login', {
         method: 'POST',
         headers: {

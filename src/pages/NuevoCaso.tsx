@@ -24,6 +24,7 @@ interface NuevoCasoForm {
   abogado: string;
   prioridad: 'Alta' | 'Media' | 'Baja';
   estado: string;
+  rit: string;
   archivos: File[];
 }
 
@@ -40,6 +41,7 @@ interface FormErrors {
   descripcion_asunto?: string;
   abogado?: string;
   estado?: string;
+  rit?: string;
   archivos?: string;
   submit?: string;
 }
@@ -112,6 +114,7 @@ const NuevoCaso = () => {
     abogado: '',
     prioridad: 'Media',
     estado: '',
+    rit: '',
     archivos: []
   });
 
@@ -158,6 +161,9 @@ const NuevoCaso = () => {
     if (!formData.estado) {
       newErrors.estado = 'Debe seleccionar un estado';
     }
+    if (!formData.rit.trim()) {
+      newErrors.rit = 'El RIT es requerido';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -173,9 +179,28 @@ const NuevoCaso = () => {
       const formDataToSend = new FormData();
       
       // Agregar los datos del caso
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key !== 'archivos') {
-          formDataToSend.append(key, value.toString());
+      const fields = [
+        'nombre_completo',
+        'fecha_nacimiento',
+        'rut',
+        'correo_electronico',
+        'telefono',
+        'domicilio',
+        'rit',
+        'tipo_asesoria',
+        'situacion_legal',
+        'motivo_consulta',
+        'motivo_consulta_otro',
+        'descripcion_asunto',
+        'antecedentes_penales',
+        'abogado',
+        'prioridad',
+        'estado'
+      ];
+      fields.forEach(field => {
+        const key = field as keyof NuevoCasoForm;
+        if (key in formData && key !== 'archivos') {
+          formDataToSend.append(key, (formData[key] as any).toString());
         }
       });
 
@@ -322,10 +347,11 @@ const NuevoCaso = () => {
                 type="text"
                 id="nombre_completo"
                 name="nombre_completo"
-                value={formData.nombre_completo}
+                value={formData.nombre_completo || ""}
                 onChange={handleChange}
                 placeholder="Ingrese el nombre completo"
                 className={errors.nombre_completo ? 'error' : ''}
+                required
               />
               {errors.nombre_completo && <span className="error-message">{errors.nombre_completo}</span>}
             </div>
@@ -338,10 +364,11 @@ const NuevoCaso = () => {
                 type="date"
                 id="fecha_nacimiento"
                 name="fecha_nacimiento"
-                value={formData.fecha_nacimiento}
+                value={formData.fecha_nacimiento ? formData.fecha_nacimiento.slice(0, 10) : ""}
                 onChange={handleChange}
                 max={fechaActual}
                 className={errors.fecha_nacimiento ? 'error' : ''}
+                required
               />
               {errors.fecha_nacimiento && <span className="error-message">{errors.fecha_nacimiento}</span>}
             </div>
@@ -356,10 +383,11 @@ const NuevoCaso = () => {
                 type="text"
                 id="rut"
                 name="rut"
-                value={formData.rut}
+                value={formData.rut || ""}
                 onChange={handleChange}
                 placeholder="12.345.678-9"
                 className={errors.rut ? 'error' : ''}
+                required
               />
               {errors.rut && <span className="error-message">{errors.rut}</span>}
             </div>
@@ -372,10 +400,11 @@ const NuevoCaso = () => {
                 type="email"
                 id="correo_electronico"
                 name="correo_electronico"
-                value={formData.correo_electronico}
+                value={formData.correo_electronico || ""}
                 onChange={handleChange}
                 placeholder="ejemplo@correo.com"
                 className={errors.correo_electronico ? 'error' : ''}
+                required
               />
               {errors.correo_electronico && <span className="error-message">{errors.correo_electronico}</span>}
             </div>
@@ -388,12 +417,26 @@ const NuevoCaso = () => {
                 type="tel"
                 id="telefono"
                 name="telefono"
-                value={formData.telefono}
+                value={formData.telefono || ""}
                 onChange={handleChange}
                 placeholder="+56912345678"
                 className={errors.telefono ? 'error' : ''}
+                required
               />
               {errors.telefono && <span className="error-message">{errors.telefono}</span>}
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="rit">RIT</label>
+              <input
+                type="text"
+                id="rit"
+                name="rit"
+                value={formData.rit || ""}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
@@ -405,10 +448,11 @@ const NuevoCaso = () => {
               type="text"
               id="domicilio"
               name="domicilio"
-              value={formData.domicilio}
+              value={formData.domicilio || ""}
               onChange={handleChange}
               placeholder="Ingrese el domicilio completo"
               className={errors.domicilio ? 'error' : ''}
+              required
             />
             {errors.domicilio && <span className="error-message">{errors.domicilio}</span>}
           </div>

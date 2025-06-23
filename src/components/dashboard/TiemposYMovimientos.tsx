@@ -3,8 +3,8 @@ import type { Caso } from "../../hooks/useCasos";
 export default function TiemposYMovimientos({ casos }: { casos: Caso[] }) {
   // Simulación de cálculo de tiempo promedio (días entre fecha y fechaActualizacion)
   const tiempos = casos.map(caso => {
-    const inicio = new Date(caso.fecha);
-    const fin = new Date(caso.fechaActualizacion);
+    const inicio = new Date(caso.fecha_apertura);
+    const fin = new Date(caso.fecha_actualizacion);
     return (fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24);
   });
   
@@ -15,7 +15,7 @@ export default function TiemposYMovimientos({ casos }: { casos: Caso[] }) {
   // Últimos movimientos (ordenados por fechaActualizacion)
   const ultimos = [...casos]
     .sort((a, b) => 
-      new Date(b.fechaActualizacion).getTime() - new Date(a.fechaActualizacion).getTime()
+      new Date(b.fecha_actualizacion).getTime() - new Date(a.fecha_actualizacion).getTime()
     )
     .slice(0, 5);
 
@@ -32,18 +32,18 @@ export default function TiemposYMovimientos({ casos }: { casos: Caso[] }) {
           {ultimos.map(caso => (
             <div key={caso.id} className="movimiento-item">
               <div className="movimiento-info">
-                <strong>{caso.nombre}</strong>
+                <strong>{caso.cliente}</strong>
                 <span>{caso.abogado}</span>
               </div>
               <div className="movimiento-fecha">
-                {new Date(caso.fechaActualizacion).toLocaleString()}
+                {new Date(caso.fecha_actualizacion).toLocaleString()}
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .dashboard-card {
           background: white;
           padding: 1.5rem;

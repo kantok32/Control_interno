@@ -30,7 +30,7 @@ interface CasoDetalle {
 }
 
 export const DocumentosCaso: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { casoId } = useParams<{ casoId: string }>();
   const [casoDetalle, setCasoDetalle] = useState<CasoDetalle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export const DocumentosCaso: React.FC = () => {
   useEffect(() => {
     const cargarDocumentos = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/casos/${id}`);
+        const response = await fetch(`http://localhost:3001/api/casos/${casoId}`);
         if (!response.ok) {
           throw new Error('Error al cargar los documentos');
         }
@@ -52,7 +52,7 @@ export const DocumentosCaso: React.FC = () => {
     };
 
     cargarDocumentos();
-  }, [id]);
+  }, [casoId]);
 
   const formatearTamaño = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
@@ -74,13 +74,13 @@ export const DocumentosCaso: React.FC = () => {
     return `${numeroFormateado}-${dv}`;
   };
 
-  const descargarArchivo = async (documento: Documento) => {
+  const handleDownload = async (documento: Documento) => {
     try {
-      // Asegurarnos de que la ruta sea relativa
-      const rutaRelativa = documento.ruta_archivo.replace(/^.*[\\\/]uploads[\\\/]/, '');
       const response = await fetch(`http://localhost:3001/api/documentos/${documento.id}/download`);
-      
-      if (!response.ok) throw new Error('Error al descargar el archivo');
+      if (!response.ok) {
+        alert('Error al descargar el documento');
+        return;
+      }
       
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -91,9 +91,9 @@ export const DocumentosCaso: React.FC = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch (err) {
-      console.error('Error al descargar:', err);
-      alert('Error al descargar el archivo');
+    } catch (error) {
+      console.error('Error al descargar:', error);
+      alert('Error al descargar el documento');
     }
   };
 
@@ -152,7 +152,7 @@ export const DocumentosCaso: React.FC = () => {
               </div>
               <div className="documento-actions">
                 <button 
-                  onClick={() => descargarArchivo(doc)}
+                  onClick={() => handleDownload(doc)}
                   className="btn-download"
                   title="Descargar archivo"
                 >

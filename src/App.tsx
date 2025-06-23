@@ -10,6 +10,9 @@ import Historial from './pages/Historial';
 import Admin from './pages/Admin';
 import NuevoCaso from './pages/NuevoCaso';
 import { DocumentosCaso } from './pages/DocumentosCaso';
+import UserManagementPage from './pages/UserManagementPage';
+import SettingsPage from './pages/SettingsPage';
+import EditarCasoPage from './pages/EditarCasoPage';
 
 function App() {
   return (
@@ -24,10 +27,14 @@ function App() {
             <Route element={<Layout />}>
               <Route index element={<Dashboard />} />
               <Route path="/casos" element={<Casos />} />
-              <Route path="/casos/:id/documentos" element={<DocumentosCaso />} />
+              <Route path="/casos/nuevo" element={<NuevoCaso />} />
               <Route path="/nuevo-caso" element={<NuevoCaso />} />
+              <Route path="/casos/:casoId/documentos" element={<DocumentosCaso />} />
+              <Route path="/casos/editar/:id" element={<EditarCasoPage />} />
               <Route path="/historial" element={<Historial />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/usuarios" element={<UserManagementPage />} />
+              <Route path="/admin/configuracion" element={<SettingsPage />} />
             </Route>
           </Route>
         </Routes>

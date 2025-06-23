@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { PageHeader } from './Layout';
 
 interface User {
   id: number;
@@ -198,25 +197,18 @@ const UserManagement: React.FC = () => {
 
   if (loading) {
     return (
-      <>
-        <PageHeader title="Gestión de Usuarios" />
-        <div className="loading">Cargando usuarios...</div>
-      </>
+      <div className="loading">Cargando usuarios...</div>
     );
   }
 
   if (error) {
     return (
-      <>
-        <PageHeader title="Gestión de Usuarios" />
-        <div className="error-message">{error}</div>
-      </>
+      <div className="error-message">{error}</div>
     );
   }
 
   return (
     <>
-      <PageHeader title="Gestión de Usuarios" />
       
       <div className="user-management-container">
         <div className="toolbar">

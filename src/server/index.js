@@ -152,7 +152,8 @@ app.post('/api/casos', async (req, res) => {
       antecedentes_penales,
       abogado,
       prioridad,
-      estado
+      estado,
+      rit
     } = req.body;
     
     // Validar campos requeridos
@@ -168,7 +169,8 @@ app.post('/api/casos', async (req, res) => {
       descripcion_asunto: 'Descripción del asunto',
       abogado: 'Abogado',
       prioridad: 'Prioridad',
-      estado: 'Estado'
+      estado: 'Estado',
+      rit: 'RIT'
     };
     
     const camposFaltantes = [];
@@ -214,9 +216,10 @@ app.post('/api/casos', async (req, res) => {
         abogado,
         prioridad,
         estado,
+        rit,
         fecha_apertura
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const [result] = await pool.query(sql, [
@@ -235,6 +238,7 @@ app.post('/api/casos', async (req, res) => {
       abogado,
       prioridad,
       estado,
+      rit,
       fecha_apertura
     ]);
     
@@ -321,7 +325,8 @@ app.put('/api/casos/:id', async (req, res) => {
       antecedentes_penales,
       abogado,
       prioridad,
-      estado
+      estado,
+      rit
     } = req.body;
 
     // Validar campos requeridos
@@ -337,7 +342,8 @@ app.put('/api/casos/:id', async (req, res) => {
       descripcion_asunto: 'Descripción del asunto',
       abogado: 'Abogado',
       prioridad: 'Prioridad',
-      estado: 'Estado'
+      estado: 'Estado',
+      rit: 'RIT'
     };
     
     const camposFaltantes = [];
@@ -376,6 +382,7 @@ app.put('/api/casos/:id', async (req, res) => {
         abogado = ?,
         prioridad = ?,
         estado = ?,
+        rit = ?,
         fecha_actualizacion = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
@@ -396,6 +403,7 @@ app.put('/api/casos/:id', async (req, res) => {
       abogado,
       prioridad,
       estado,
+      rit,
       id
     ]);
 
@@ -417,6 +425,26 @@ app.put('/api/casos/:id', async (req, res) => {
   } catch (error) {
     console.error('Error al actualizar caso:', error);
     res.status(500).json({ error: 'Error al actualizar el caso' });
+  }
+});
+
+// Eliminar un caso por ID
+app.delete('/api/casos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Verificar si el caso existe
+    const [casos] = await pool.query('SELECT * FROM casos WHERE id = ?', [id]);
+    if (!casos || casos.length === 0) {
+      return res.status(404).json({ error: 'Caso no encontrado' });
+    }
+    // Eliminar documentos asociados
+    await pool.query('DELETE FROM documentos WHERE caso_id = ?', [id]);
+    // Eliminar el caso
+    await pool.query('DELETE FROM casos WHERE id = ?', [id]);
+    res.json({ message: 'Caso y documentos asociados eliminados exitosamente' });
+  } catch (error) {
+    console.error('Error al eliminar caso:', error);
+    res.status(500).json({ error: 'Error al eliminar el caso' });
   }
 });
 
@@ -871,7 +899,8 @@ app.post('/api/casos/crear', upload.array('archivos'), async (req, res) => {
       antecedentes_penales,
       abogado,
       prioridad,
-      estado
+      estado,
+      rit
     } = req.body;
 
     // Validar campos requeridos
@@ -887,7 +916,8 @@ app.post('/api/casos/crear', upload.array('archivos'), async (req, res) => {
       descripcion_asunto: 'Descripción del asunto',
       abogado: 'Abogado',
       prioridad: 'Prioridad',
-      estado: 'Estado'
+      estado: 'Estado',
+      rit: 'RIT'
     };
     
     const camposFaltantes = [];
@@ -927,8 +957,9 @@ app.post('/api/casos/crear', upload.array('archivos'), async (req, res) => {
         abogado,
         prioridad,
         estado,
+        rit,
         fecha_apertura
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         nombre_completo,
         fecha_nacimiento,
@@ -945,6 +976,7 @@ app.post('/api/casos/crear', upload.array('archivos'), async (req, res) => {
         abogado,
         prioridad,
         estado,
+        rit,
         fecha_apertura
       ]
     );

@@ -1,87 +1,74 @@
 import express from 'express';
 import type { Request, Response, RequestHandler } from 'express';
-import mysql from 'mysql2/promise';
 import cors from 'cors';
+import mysql from 'mysql2/promise';
+import path from 'path';
+import fs from 'fs';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join, relative } from 'path';
-import fs from 'fs/promises';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const uploadsDir = join(__dirname, '../../uploads');
-
-// Función para normalizar rutas
-const normalizePath = (filePath: string): string => {
-  if (!filePath) return '';
-  
-  // Si la ruta es absoluta de Windows, extraer solo el nombre del archivo
-  if (filePath.includes('C:\\') || filePath.includes('C:/')) {
-    const fileName = filePath.split('\\').pop() || filePath.split('/').pop();
-    return `uploads/${fileName}`;
-  }
-  
-  // Si ya es una ruta relativa con uploads/, mantenerla
-  if (filePath.startsWith('uploads/')) {
-    return filePath;
-  }
-  
-  // Si no tiene formato conocido, agregar el prefijo uploads/
-  return `uploads/${filePath}`;
-};
-
-// Función para obtener la ruta completa del archivo en el servidor
-const getServerFilePath = (relativePath: string): string => {
-  const normalizedPath = normalizePath(relativePath);
-  return join(__dirname, '../../', normalizedPath);
-};
-
-// Función para convertir ruta absoluta a relativa
-const toRelativePath = (absolutePath: string): string => {
-  const relativePath = relative(__dirname, absolutePath);
-  return normalizePath(relativePath);
-};
-
-dotenv.config({ path: join(__dirname, '../../config.env') });
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3001;
+
+// Configuración de CORS
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Configurar el middleware para servir archivos estáticos
-app.use('/uploads', express.static(uploadsDir));
+// Configuración de la base de datos
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'control_interno',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+// Función para normalizar rutas de archivos
+const normalizePath = (filePath: string): string => {
+  // Convertir separadores de Windows a Unix
+  let normalized = filePath.replace(/\\/g, '/');
+  
+  // Remover múltiples separadores consecutivos
+  normalized = normalized.replace(/\/+/g, '/');
+  
+  // Si la ruta es absoluta de Windows, convertirla a relativa
+  if (normalized.match(/^[A-Z]:/)) {
+    // Extraer solo la parte después de uploads/
+    const uploadsIndex = normalized.indexOf('uploads/');
+    if (uploadsIndex !== -1) {
+      normalized = normalized.substring(uploadsIndex);
+    }
+  }
+  
+  return normalized;
+};
+
+// Función para obtener la ruta completa del servidor
+const getServerFilePath = (relativePath: string): string => {
+  return path.join(__dirname, '..', '..', relativePath);
+};
 
 // Agregar endpoint de ping
-app.get('/api/ping', (req, res) => {
+app.get('/api/ping', (_req, res) => {
   res.json({ message: 'pong' });
 });
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || '192.140.56.40',
-  user: process.env.DB_USER || 'invers26_claudio_m1',
-  password: process.env.DB_PASSWORD || 'Ni.co0189',
-  database: process.env.DB_NAME || 'invers26_ERP'
-});
-
-interface Documento {
-  id: number;
-  nombre: string;
-  ruta_archivo?: string;
-}
-
-type QueryResult = Array<Record<string, any>>;
-
-const getCasos: RequestHandler = async (req, res) => {
+const getCasos: RequestHandler = async (_req, res) => {
   try {
-    const query = `
+    const [rows] = await pool.query(`
       SELECT 
         c.*,
-        (SELECT COUNT(*) FROM documentos d WHERE d.caso_id = c.id) as total_documentos,
-        (SELECT MAX(fecha_creacion) FROM documentos d WHERE d.caso_id = c.id) as ultimo_documento
-      FROM casos c 
-      ORDER BY c.fecha_apertura DESC
-    `;
-    const [rows] = await pool.query(query);
+        COUNT(d.id) as total_documentos,
+        MAX(d.fecha_subida) as ultimo_documento
+      FROM casos c
+      LEFT JOIN documentos d ON c.id = d.caso_id
+      GROUP BY c.id
+      ORDER BY c.fecha_actualizacion DESC
+    `);
     res.json(rows);
   } catch (error) {
     console.error('Error al obtener casos:', error);
@@ -98,7 +85,8 @@ const getCasoById: RequestHandler = async (req, res) => {
     const [documentos] = await pool.query('SELECT * FROM documentos WHERE caso_id = ?', [id]) as [any[], any];
     
     if (!Array.isArray(caso) || caso.length === 0) {
-      return res.status(404).json({ error: 'Caso no encontrado' });
+      res.status(404).json({ error: 'Caso no encontrado' });
+      return;
     }
 
     res.json({
@@ -135,7 +123,8 @@ const updateCaso: RequestHandler = async (req, res) => {
     } = req.body;
 
     if (!nombre_completo || !rut || !tipo_asesoria || !motivo_consulta || !abogado) {
-      return res.status(400).json({ error: 'Faltan campos requeridos' });
+      res.status(400).json({ error: 'Faltan campos requeridos' });
+      return;
     }
 
     const rutLimpio = rut.replace(/\./g, '').replace(/-/g, '');
@@ -182,7 +171,8 @@ const updateCaso: RequestHandler = async (req, res) => {
     ]) as [any, any];
 
     if (!result || result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Caso no encontrado' });
+      res.status(404).json({ error: 'Caso no encontrado' });
+      return;
     }
 
     const [casoActualizado] = await pool.query('SELECT * FROM casos WHERE id = ?', [id]) as [any[], any];
@@ -196,7 +186,7 @@ const updateCaso: RequestHandler = async (req, res) => {
 app.put('/api/casos/:id', updateCaso);
 
 // Actualizar las rutas en la base de datos (DEBE IR ANTES DE LA RUTA CON PARÁMETRO)
-app.get('/api/documentos/actualizar-rutas', async (req: Request, res: Response) => {
+app.get('/api/documentos/actualizar-rutas', async (_req: Request, res: Response) => {
   try {
     console.log('Iniciando actualización de rutas...');
     
@@ -262,7 +252,8 @@ app.get('/api/documentos/:id', async (req: Request, res: Response) => {
     `, [id]) as [any[], any];
 
     if (!rows || rows.length === 0) {
-      return res.status(404).json({ error: 'Documento no encontrado' });
+      res.status(404).json({ error: 'Documento no encontrado' });
+      return;
     }
 
     res.json(rows[0]);
@@ -279,42 +270,34 @@ app.get('/api/documentos/:id/download', async (req: Request, res: Response) => {
     const [rows] = await pool.query('SELECT * FROM documentos WHERE id = ?', [id]) as [any[], any];
 
     if (!rows || rows.length === 0) {
-      return res.status(404).json({ error: 'Documento no encontrado' });
+      res.status(404).json({ error: 'Documento no encontrado' });
+      return;
     }
 
     const documento = rows[0];
     if (!documento.ruta_archivo) {
-      return res.status(404).json({ error: 'No hay archivo asociado a este documento' });
+      res.status(404).json({ error: 'No hay archivo asociado a este documento' });
+      return;
     }
 
-    // Normalizar la ruta del archivo
-    const normalizedPath = normalizePath(documento.ruta_archivo);
-    const filePath = getServerFilePath(normalizedPath);
-
+    const filePath = getServerFilePath(documento.ruta_archivo);
+    
     try {
       // Verificar si el archivo existe
-      await fs.access(filePath);
+      await fs.promises.access(filePath);
       
       // Enviar el archivo
-      res.download(filePath, documento.nombre, (err) => {
-        if (err) {
-          console.error('Error al enviar el archivo:', err);
-          if (!res.headersSent) {
-            res.status(500).json({ error: 'Error al enviar el archivo' });
-          }
-        }
-      });
-    } catch (error) {
-      console.error('Error al acceder al archivo:', error);
+      res.download(filePath, documento.nombre);
+    } catch (fileError) {
+      console.error('Error al acceder al archivo:', fileError);
       res.status(404).json({ error: 'Archivo no encontrado en el servidor' });
     }
   } catch (error) {
-    console.error('Error en el endpoint de descarga:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error('Error al descargar documento:', error);
+    res.status(500).json({ error: 'Error al descargar el documento' });
   }
 });
 
-const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 }); 

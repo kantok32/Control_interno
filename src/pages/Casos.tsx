@@ -6,7 +6,7 @@ import { useCasos } from '../context/CasosContext';
 import { FiltrosCasos } from '../components/FiltrosCasos';
 
 const Casos = () => {
-  const { casos, loading, error, filtrarCasos, cargarCasos } = useCasos();
+  const { loading, error, filtrarCasos, cargarCasos } = useCasos();
   const [filtros, setFiltros] = useState({
     estado: 'TODOS',
     prioridad: 'TODAS',
@@ -48,7 +48,12 @@ const Casos = () => {
           <p>Mostrando {casosFiltrados.length} casos</p>
         </div>
         <CasosTable 
-          casos={casosFiltrados} 
+          casos={casosFiltrados.map((caso: any) => ({
+            ...caso,
+            cliente: caso.nombre_completo,
+            asunto: caso.descripcion_asunto,
+            rit: typeof caso.rit === 'string' ? caso.rit : null
+          }))} 
           onCasoUpdated={handleCasoUpdated}
         />
       </section>
