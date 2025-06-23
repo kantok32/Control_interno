@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { FaTachometerAlt, FaUsers, FaCogs } from 'react-icons/fa';
 import logo from '../assets/Logo_hoffmann.negro.png';
 
@@ -16,6 +16,12 @@ const Sidebar = () => {
                     <li><NavLink to="/"><i className="fas fa-tachometer-alt"></i> DASHBOARD</NavLink></li>
                     <li><NavLink to="/casos"><i className="fas fa-briefcase"></i> CASOS</NavLink></li>
                     <li><NavLink to="/historial"><i className="fas fa-history"></i> HISTORIAL</NavLink></li>
+                    <li>
+                        <Link to="/documentacion-personal">
+                            <i className="fas fa-file-alt"></i>
+                            <span>Doc. Personal</span>
+                        </Link>
+                    </li>
                     <li className="sidebar-dropdown">
                         <button onClick={() => setIsAdminOpen(!isAdminOpen)}>
                             <i className="fas fa-user-shield"></i> ADMIN <i className={`fas fa-chevron-down arrow ${isAdminOpen ? 'open' : ''}`}></i>

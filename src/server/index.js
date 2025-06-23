@@ -10,6 +10,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/auth.js';
 import { authenticateToken, requirePermission, logAuditoria } from './middleware/auth.js';
+import personalRoutes from './routes/personal.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -91,6 +92,7 @@ app.use('/uploads', express.static(join(__dirname, '../../uploads')));
 
 // Rutas de autenticación (sin autenticación requerida)
 app.use('/api/auth', authRoutes);
+app.use('/api/personal', personalRoutes);
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || '192.140.56.40',
@@ -98,6 +100,8 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD || 'Ni.co0189',
   database: process.env.DB_NAME || 'invers26_ERP'
 });
+
+export { pool };
 
 // ===== ENDPOINTS PARA ESTADOS =====
 

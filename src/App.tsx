@@ -13,6 +13,10 @@ import { DocumentosCaso } from './pages/DocumentosCaso';
 import UserManagementPage from './pages/UserManagementPage';
 import SettingsPage from './pages/SettingsPage';
 import EditarCasoPage from './pages/EditarCasoPage';
+import DocumentacionPersonal from './pages/DocumentacionPersonal';
+import Personal from './pages/Personal';
+import NuevoPersonal from './pages/NuevoPersonal';
+import DocumentosPersonal from './pages/DocumentosPersonal';
 
 function App() {
   return (
@@ -35,6 +39,10 @@ function App() {
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/usuarios" element={<UserManagementPage />} />
               <Route path="/admin/configuracion" element={<SettingsPage />} />
+              <Route path="/documentacion-personal" element={<DocumentacionPersonal />} />
+              <Route path="/personal" element={<Personal />} />
+              <Route path="/personal/nuevo" element={<NuevoPersonal />} />
+              <Route path="/personal/:id/documentos" element={<DocumentosPersonal />} />
             </Route>
           </Route>
         </Routes>
