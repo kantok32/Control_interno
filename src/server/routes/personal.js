@@ -25,7 +25,20 @@ const upload = multer({ storage });
 // Obtener todo el personal
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM personal_documentacion');
+    const [rows] = await pool.query(`
+      SELECT 
+        id,
+        nombre,
+        tipo_contrato as cargo,
+        prevision as departamento,
+        inicio_contrato as fecha_ingreso,
+        sueldo_bruto,
+        sueldo_liquido,
+        adp,
+        termino_contrato
+      FROM personal_documentacion 
+      ORDER BY nombre
+    `);
     res.json(rows);
   } catch (error) {
     console.error('Error al obtener personal:', error);
