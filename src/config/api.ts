@@ -1,5 +1,5 @@
 // Configuración de la API según el entorno
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://inversioneshoffmann.cl/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.inversioneshoffmann.cl';
 
 export const API_ENDPOINTS = {
   AUTH: {

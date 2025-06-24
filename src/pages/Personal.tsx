@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { PageHeader } from "../components/Layout";
 import { useNavigate } from 'react-router-dom';
 import PersonalTable from '../components/PersonalTable';
+import API_ENDPOINTS from '../config/api';
 
 const Personal = () => {
   const [personal, setPersonal] = useState<any[]>([]);
@@ -10,7 +11,7 @@ const Personal = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/personal')
+    fetch(API_ENDPOINTS.PERSONAL.LIST)
       .then(res => res.json())
       .then(data => {
         setPersonal(data);
