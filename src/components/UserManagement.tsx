@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import API_ENDPOINTS from '../config/api';
 
 interface User {
   id: number;
@@ -51,7 +52,7 @@ const UserManagement: React.FC = () => {
   const loadUsers = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:3001/api/auth/usuarios', {
+      const response = await fetch(API_ENDPOINTS.AUTH.USUARIOS, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
@@ -75,7 +76,7 @@ const UserManagement: React.FC = () => {
   const loadRoles = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:3001/api/auth/roles', {
+      const response = await fetch(API_ENDPOINTS.AUTH.ROLES, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
@@ -134,8 +135,8 @@ const UserManagement: React.FC = () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
       const url = editingUser 
-        ? `http://localhost:3001/api/auth/usuarios/${editingUser.id}`
-        : 'http://localhost:3001/api/auth/usuarios';
+        ? API_ENDPOINTS.AUTH.USUARIOS + `/${editingUser.id}`
+        : API_ENDPOINTS.AUTH.USUARIOS;
 
       const method = editingUser ? 'PUT' : 'POST';
       const body = editingUser 

@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
+import API_ENDPOINTS from '../config/api';
 
 // Interfaz para definir la forma del contexto de autenticación
 interface User {
@@ -58,7 +59,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (username: string, password: string) => {
     try {
       console.log('Enviando login:', { username, password });
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +98,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/refresh', {
+      const response = await fetch(API_ENDPOINTS.AUTH.REFRESH, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,7 +129,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       // Intentar hacer logout en el servidor
       if (accessToken) {
-        await fetch('http://localhost:3001/api/auth/logout', {
+        await fetch(API_ENDPOINTS.AUTH.LOGOUT, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${accessToken}`,
