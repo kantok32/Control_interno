@@ -4,10 +4,9 @@ import PersonalTable from '../components/PersonalTable';
 import API_ENDPOINTS from '../config/api';
 
 const DocumentacionPersonal: React.FC = () => {
-  const [personal, setPersonal] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [personal, setPersonal] = useState([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPersonal = async () => {
@@ -27,7 +26,6 @@ const DocumentacionPersonal: React.FC = () => {
     fetchPersonal();
   }, []);
 
-  if (loading) return <div className="loading">Cargando personal...</div>;
   if (error) return <div className="error">{error}</div>;
 
   return (

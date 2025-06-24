@@ -108,7 +108,6 @@ export const EditarCasoForm: React.FC<EditarCasoFormProps> = ({ caso, onClose, o
         throw new Error(errorData.message || 'Error al actualizar el caso');
       }
 
-      const result = await response.json();
       onSave();
       onClose();
     } catch (err) {
