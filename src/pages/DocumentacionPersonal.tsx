@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PersonalTable from '../components/PersonalTable';
-import API_ENDPOINTS from '../config/api';
+import API_ENDPOINTS, { authenticatedFetch } from '../config/api';
 
 const DocumentacionPersonal: React.FC = () => {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ const DocumentacionPersonal: React.FC = () => {
   useEffect(() => {
     const fetchPersonal = async () => {
       try {
-        const response = await fetch(API_ENDPOINTS.PERSONAL.LIST);
+        const response = await authenticatedFetch(API_ENDPOINTS.PERSONAL.LIST);
         if (!response.ok) {
           throw new Error('Error al cargar personal');
         }

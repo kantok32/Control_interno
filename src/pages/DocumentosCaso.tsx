@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import API_ENDPOINTS from '../config/api';
+import API_ENDPOINTS, { authenticatedFetch } from '../config/api';
 import '../styles/components.css';
 
 interface Documento {
@@ -41,7 +41,7 @@ export const DocumentosCaso: React.FC = () => {
       if (!casoId) return;
       
       try {
-        const response = await fetch(API_ENDPOINTS.CASOS.GET(casoId));
+        const response = await authenticatedFetch(API_ENDPOINTS.CASOS.GET(casoId));
         if (!response.ok) {
           throw new Error('Error al cargar el caso');
         }
@@ -80,7 +80,7 @@ export const DocumentosCaso: React.FC = () => {
 
   const handleDownload = async (documento: Documento) => {
     try {
-      const response = await fetch(API_ENDPOINTS.DOCUMENTOS.DOWNLOAD(documento.id.toString()));
+      const response = await authenticatedFetch(API_ENDPOINTS.DOCUMENTOS.DOWNLOAD(documento.id.toString()));
       if (!response.ok) {
         throw new Error('Error al descargar documento');
       }

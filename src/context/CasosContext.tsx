@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import API_ENDPOINTS from '../config/api';
+import API_ENDPOINTS, { authenticatedFetch } from '../config/api';
 
 interface Caso {
   id: string;
@@ -44,7 +44,7 @@ export const CasosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(API_ENDPOINTS.CASOS.LIST);
+      const response = await authenticatedFetch(API_ENDPOINTS.CASOS.LIST);
       if (!response.ok) {
         throw new Error('Error al cargar los casos');
       }
@@ -85,11 +85,8 @@ export const CasosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         estado: formData.get('estado')
       };
 
-      const responseCaso = await fetch(API_ENDPOINTS.CASOS.CREATE, {
+      const responseCaso = await authenticatedFetch(API_ENDPOINTS.CASOS.CREATE, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify(casoData)
       });
 

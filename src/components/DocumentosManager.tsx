@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import API_ENDPOINTS from '../config/api';
+import API_ENDPOINTS, { authenticatedFetch } from '../config/api';
 
 interface Documento {
   id: number;
@@ -39,7 +39,7 @@ const DocumentosManager: React.FC<DocumentosManagerProps> = ({ casoId }) => {
   const cargarDocumentos = async () => {
     setLoading(true);
     try {
-      const response = await fetch(API_ENDPOINTS.CASOS.DOCUMENTOS(casoId));
+      const response = await authenticatedFetch(API_ENDPOINTS.CASOS.DOCUMENTOS(casoId));
       if (!response.ok) {
         throw new Error('Error al cargar documentos');
       }
@@ -91,7 +91,7 @@ const DocumentosManager: React.FC<DocumentosManagerProps> = ({ casoId }) => {
     }
 
     try {
-      const response = await fetch(API_ENDPOINTS.DOCUMENTOS.DELETE(id.toString()), {
+      const response = await authenticatedFetch(API_ENDPOINTS.DOCUMENTOS.DELETE(id.toString()), {
         method: 'DELETE'
       });
 
@@ -120,7 +120,7 @@ const DocumentosManager: React.FC<DocumentosManagerProps> = ({ casoId }) => {
         throw new Error('No hay archivo para descargar');
       }
 
-      const response = await fetch(API_ENDPOINTS.DOCUMENTOS.DOWNLOAD(documento.id.toString()));
+      const response = await authenticatedFetch(API_ENDPOINTS.DOCUMENTOS.DOWNLOAD(documento.id.toString()));
       if (!response.ok) {
         throw new Error('Error al descargar el archivo');
       }

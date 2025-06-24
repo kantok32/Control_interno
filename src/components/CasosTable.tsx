@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { EditarCasoForm } from './EditarCasoForm';
 import ClienteDetalleModal from './ClienteDetalleModal';
-import API_ENDPOINTS from '../config/api';
+import API_ENDPOINTS, { authenticatedFetch } from '../config/api';
 
 interface Caso {
   id: string;
@@ -82,7 +82,7 @@ export const CasosTable: React.FC<CasosTableProps> = ({ casos, onCasoUpdated }) 
   const handleDelete = async (casoId: string) => {
     if (!window.confirm('¿Estás seguro de que deseas eliminar este caso? Esta acción no se puede deshacer.')) return;
     try {
-      const response = await fetch(API_ENDPOINTS.CASOS.DELETE(casoId), {
+      const response = await authenticatedFetch(API_ENDPOINTS.CASOS.DELETE(casoId), {
         method: 'DELETE',
       });
       if (!response.ok) {

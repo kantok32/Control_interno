@@ -40,4 +40,61 @@ export const API_ENDPOINTS = {
   }
 };
 
+// Función helper para hacer solicitudes autenticadas
+export const authenticatedFetch = async (url: string, options: RequestInit = {}) => {
+  const token = localStorage.getItem('accessToken');
+  
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string> || {}),
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(url, {
+    ...options,
+    headers,
+  });
+
+  // Si el token expiró (401), intentar refrescar
+  if (response.status === 401 && token) {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (refreshToken) {
+        const refreshResponse = await fetch(API_ENDPOINTS.AUTH.REFRESH, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ refreshToken }),
+        });
+
+        if (refreshResponse.ok) {
+          const data = await refreshResponse.json();
+          localStorage.setItem('accessToken', data.accessToken);
+          localStorage.setItem('refreshToken', data.refreshToken);
+          
+          // Reintentar la solicitud original con el nuevo token
+          headers['Authorization'] = `Bearer ${data.accessToken}`;
+          return await fetch(url, {
+            ...options,
+            headers,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error al refrescar token:', error);
+      // Si falla el refresh, redirigir al login
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+  }
+
+  return response;
+};
+
 export default API_ENDPOINTS; 

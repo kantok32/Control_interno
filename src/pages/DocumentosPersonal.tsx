@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import API_ENDPOINTS from '../config/api';
+import API_ENDPOINTS, { authenticatedFetch } from '../config/api';
 
 interface DocumentoPersonal {
   id: number;
@@ -30,7 +30,7 @@ const DocumentosPersonal: React.FC = () => {
       if (!id) return;
       
       try {
-        const response = await fetch(API_ENDPOINTS.PERSONAL.DOCUMENTOS(id));
+        const response = await authenticatedFetch(API_ENDPOINTS.PERSONAL.DOCUMENTOS(id));
         if (!response.ok) {
           throw new Error('Error al cargar documentos');
         }
@@ -170,9 +170,8 @@ const DocumentosPersonal: React.FC = () => {
               if (!id) return;
               
               try {
-                const res = await fetch(API_ENDPOINTS.PERSONAL.DOCUMENTO(id, editDoc.id.toString()), {
+                const res = await authenticatedFetch(API_ENDPOINTS.PERSONAL.DOCUMENTO(id, editDoc.id.toString()), {
                   method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ nombre: editNombre, descripcion: editDescripcion })
                 });
                 if (res.ok) {
@@ -285,7 +284,7 @@ const DocumentosPersonal: React.FC = () => {
                       if (!id) return;
                       
                       try {
-                        const res = await fetch(API_ENDPOINTS.PERSONAL.DOCUMENTO(id, doc.id.toString()), {
+                        const res = await authenticatedFetch(API_ENDPOINTS.PERSONAL.DOCUMENTO(id, doc.id.toString()), {
                           method: 'DELETE'
                         });
                         if (res.ok) {

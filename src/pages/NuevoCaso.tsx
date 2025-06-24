@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCasos } from '../context/CasosContext';
 import '../styles/components.css';
-import API_ENDPOINTS from '../config/api';
+import API_ENDPOINTS, { authenticatedFetch } from '../config/api';
 
 interface Estado {
   nombre: string;
@@ -82,7 +82,7 @@ const NuevoCaso = () => {
   useEffect(() => {
     const cargarEstados = async () => {
       try {
-        const response = await fetch(API_ENDPOINTS.ESTADOS.LIST);
+        const response = await authenticatedFetch(API_ENDPOINTS.ESTADOS.LIST);
         if (!response.ok) {
           throw new Error('Error al cargar estados');
         }

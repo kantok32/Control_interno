@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import API_ENDPOINTS from '../config/api';
+import API_ENDPOINTS, { authenticatedFetch } from '../config/api';
 
 export interface Caso {
   id: string;
@@ -49,8 +49,8 @@ export function useCasos() {
     setError(null);
     try {
       const [responseCasos, responseEstados] = await Promise.all([
-        fetch(API_ENDPOINTS.CASOS.LIST),
-        fetch(API_ENDPOINTS.CASOS.LIST.replace('/casos', '/estados'))
+        authenticatedFetch(API_ENDPOINTS.CASOS.LIST),
+        authenticatedFetch(API_ENDPOINTS.CASOS.LIST.replace('/casos', '/estados'))
       ]);
 
       if (!responseCasos.ok) throw new Error('Error al cargar casos');

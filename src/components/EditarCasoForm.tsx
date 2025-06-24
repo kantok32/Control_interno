@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/components.css';
-import API_ENDPOINTS from '../config/api';
+import API_ENDPOINTS, { authenticatedFetch } from '../config/api';
 
 interface Caso {
   id: string;
@@ -53,11 +53,7 @@ export const EditarCasoForm: React.FC<EditarCasoFormProps> = ({ caso, onClose, o
   useEffect(() => {
     const cargarAbogados = async () => {
       try {
-        const response = await fetch(API_ENDPOINTS.AUTH.ABOGADOS, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+        const response = await authenticatedFetch(API_ENDPOINTS.AUTH.ABOGADOS);
         if (!response.ok) {
           throw new Error('Error al cargar abogados');
         }
@@ -94,12 +90,8 @@ export const EditarCasoForm: React.FC<EditarCasoFormProps> = ({ caso, onClose, o
     setError(null);
 
     try {
-      const response = await fetch(API_ENDPOINTS.CASOS.UPDATE(caso.id), {
+      const response = await authenticatedFetch(API_ENDPOINTS.CASOS.UPDATE(caso.id), {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
         body: JSON.stringify(formData)
       });
 
