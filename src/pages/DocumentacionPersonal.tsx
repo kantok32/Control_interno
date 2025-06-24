@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PersonalTable from '../components/PersonalTable';
+import API_ENDPOINTS from '../config/api';
 
 const DocumentacionPersonal: React.FC = () => {
   const [personal, setPersonal] = useState<any[]>([]);
@@ -9,16 +10,21 @@ const DocumentacionPersonal: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/personal')
-      .then(res => res.json())
-      .then(data => {
+    const fetchPersonal = async () => {
+      try {
+        const response = await fetch(API_ENDPOINTS.PERSONAL.LIST);
+        if (!response.ok) {
+          throw new Error('Error al cargar personal');
+        }
+        const data = await response.json();
         setPersonal(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('Error al cargar los documentos');
-        setLoading(false);
-      });
+      } catch (error) {
+        console.error('Error:', error);
+        setError('Error al cargar personal');
+      }
+    };
+
+    fetchPersonal();
   }, []);
 
   if (loading) return <div className="loading">Cargando personal...</div>;

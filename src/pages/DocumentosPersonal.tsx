@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import API_ENDPOINTS from '../config/api';
 
 interface DocumentoPersonal {
   id: number;
@@ -25,16 +26,25 @@ const DocumentosPersonal: React.FC = () => {
   const [editDescripcion, setEditDescripcion] = useState('');
 
   useEffect(() => {
-    fetch(`http://localhost:3001/api/personal/${id}/documentos`)
-      .then(res => res.json())
-      .then(data => {
+    const cargarDocumentos = async () => {
+      if (!id) return;
+      
+      try {
+        const response = await fetch(API_ENDPOINTS.PERSONAL.DOCUMENTOS(id));
+        if (!response.ok) {
+          throw new Error('Error al cargar documentos');
+        }
+        const data = await response.json();
         setDocumentos(data);
+      } catch (error) {
+        console.error('Error:', error);
+        setError('Error al cargar documentos');
+      } finally {
         setLoading(false);
-      })
-      .catch(() => {
-        setError('Error al cargar los documentos');
-        setLoading(false);
-      });
+      }
+    };
+
+    cargarDocumentos();
   }, [id]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,13 +55,14 @@ const DocumentosPersonal: React.FC = () => {
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !nombre.trim()) return;
+    if (!id || !file) return;
+    
     const formData = new FormData();
     formData.append('archivo', file);
     formData.append('nombre', nombre);
     formData.append('descripcion', descripcion);
     try {
-      const res = await fetch(`http://localhost:3001/api/personal/${id}/documentos`, {
+      const res = await fetch(API_ENDPOINTS.PERSONAL.DOCUMENTOS(id), {
         method: 'POST',
         body: formData
       });
@@ -156,8 +167,10 @@ const DocumentosPersonal: React.FC = () => {
           <form
             onSubmit={async e => {
               e.preventDefault();
+              if (!id) return;
+              
               try {
-                const res = await fetch(`http://localhost:3001/api/personal/${id}/documentos/${editDoc.id}`, {
+                const res = await fetch(API_ENDPOINTS.PERSONAL.DOCUMENTO(id, editDoc.id.toString()), {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ nombre: editNombre, descripcion: editDescripcion })
@@ -231,7 +244,7 @@ const DocumentosPersonal: React.FC = () => {
               <td>
                 {doc.ruta_archivo.endsWith('.pdf') ? (
                   <a
-                    href={`http://localhost:3001/${doc.ruta_archivo}`}
+                    href={API_ENDPOINTS.FILES.GET(doc.ruta_archivo)}
                     target="_blank"
                     rel="noopener noreferrer"
                     download
@@ -241,7 +254,7 @@ const DocumentosPersonal: React.FC = () => {
                   </a>
                 ) : (
                   <a
-                    href={`http://localhost:3001/${doc.ruta_archivo}`}
+                    href={API_ENDPOINTS.FILES.GET(doc.ruta_archivo)}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ color: '#3182ce', textDecoration: 'underline' }}
@@ -269,8 +282,10 @@ const DocumentosPersonal: React.FC = () => {
                   title="Eliminar"
                   onClick={async () => {
                     if (window.confirm('¿Seguro que deseas eliminar este documento?')) {
+                      if (!id) return;
+                      
                       try {
-                        const res = await fetch(`http://localhost:3001/api/personal/${id}/documentos/${doc.id}`, {
+                        const res = await fetch(API_ENDPOINTS.PERSONAL.DOCUMENTO(id, doc.id.toString()), {
                           method: 'DELETE'
                         });
                         if (res.ok) {

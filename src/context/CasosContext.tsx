@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import API_ENDPOINTS from '../config/api';
 
 interface Caso {
   id: string;
@@ -43,7 +44,7 @@ export const CasosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:3001/api/casos');
+      const response = await fetch(API_ENDPOINTS.CASOS.LIST);
       if (!response.ok) {
         throw new Error('Error al cargar los casos');
       }
@@ -84,7 +85,7 @@ export const CasosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         estado: formData.get('estado')
       };
 
-      const responseCaso = await fetch('http://localhost:3001/api/casos', {
+      const responseCaso = await fetch(API_ENDPOINTS.CASOS.CREATE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -112,7 +113,7 @@ export const CasosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             docFormData.append('tipo', archivo.type);
             docFormData.append('descripcion', '');
 
-            const responseDoc = await fetch('http://localhost:3001/api/documentos', {
+            const responseDoc = await fetch(API_ENDPOINTS.DOCUMENTOS.UPLOAD, {
               method: 'POST',
               body: docFormData
             });

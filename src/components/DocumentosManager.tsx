@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_ENDPOINTS from '../config/api';
 
 interface Documento {
   id: number;
@@ -32,20 +33,21 @@ const DocumentosManager: React.FC<DocumentosManagerProps> = ({ casoId }) => {
   });
 
   useEffect(() => {
-    fetchDocumentos();
+    cargarDocumentos();
   }, [casoId]);
 
-  const fetchDocumentos = async () => {
+  const cargarDocumentos = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/casos/${casoId}/documentos`);
+      const response = await fetch(API_ENDPOINTS.CASOS.DOCUMENTOS(casoId));
       if (!response.ok) {
         throw new Error('Error al cargar documentos');
       }
       const data = await response.json();
       setDocumentos(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
+    } catch (error) {
+      console.error('Error:', error);
+      setError('Error al cargar documentos');
     } finally {
       setLoading(false);
     }
@@ -54,7 +56,7 @@ const DocumentosManager: React.FC<DocumentosManagerProps> = ({ casoId }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3001/api/documentos', {
+      const response = await fetch(API_ENDPOINTS.DOCUMENTOS.UPLOAD, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,7 +71,7 @@ const DocumentosManager: React.FC<DocumentosManagerProps> = ({ casoId }) => {
         throw new Error('Error al crear documento');
       }
 
-      await fetchDocumentos();
+      await cargarDocumentos();
       setShowForm(false);
       setFormData({
         nombre: '',
@@ -83,23 +85,24 @@ const DocumentosManager: React.FC<DocumentosManagerProps> = ({ casoId }) => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este documento?')) {
+  const eliminarDocumento = async (id: number) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este documento?')) {
       return;
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/documentos/${id}`, {
-        method: 'DELETE',
+      const response = await fetch(API_ENDPOINTS.DOCUMENTOS.DELETE(id.toString()), {
+        method: 'DELETE'
       });
 
       if (!response.ok) {
         throw new Error('Error al eliminar documento');
       }
 
-      await fetchDocumentos();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
+      await cargarDocumentos();
+    } catch (error) {
+      console.error('Error:', error);
+      setError('Error al eliminar documento');
     }
   };
 
@@ -117,7 +120,7 @@ const DocumentosManager: React.FC<DocumentosManagerProps> = ({ casoId }) => {
         throw new Error('No hay archivo para descargar');
       }
 
-      const response = await fetch(`http://localhost:3001/api/documentos/${documento.id}/download`);
+      const response = await fetch(API_ENDPOINTS.DOCUMENTOS.DOWNLOAD(documento.id.toString()));
       if (!response.ok) {
         throw new Error('Error al descargar el archivo');
       }
@@ -276,7 +279,7 @@ const DocumentosManager: React.FC<DocumentosManagerProps> = ({ casoId }) => {
                     </button>
                   )}
                   <button
-                    onClick={() => handleDelete(documento.id)}
+                    onClick={() => eliminarDocumento(documento.id)}
                     className="text-red-600 hover:text-red-800"
                     title="Eliminar documento"
                   >

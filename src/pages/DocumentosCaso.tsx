@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import API_ENDPOINTS from '../config/api';
 import '../styles/components.css';
 
 interface Documento {
@@ -36,22 +37,25 @@ export const DocumentosCaso: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const cargarDocumentos = async () => {
+    const cargarCaso = async () => {
+      if (!casoId) return;
+      
       try {
-        const response = await fetch(`http://localhost:3001/api/casos/${casoId}`);
+        const response = await fetch(API_ENDPOINTS.CASOS.GET(casoId));
         if (!response.ok) {
-          throw new Error('Error al cargar los documentos');
+          throw new Error('Error al cargar el caso');
         }
         const data = await response.json();
         setCasoDetalle(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error desconocido');
+      } catch (error) {
+        console.error('Error:', error);
+        setError('Error al cargar el caso');
       } finally {
         setLoading(false);
       }
     };
 
-    cargarDocumentos();
+    cargarCaso();
   }, [casoId]);
 
   const formatearTamaño = (bytes: number) => {
@@ -76,10 +80,9 @@ export const DocumentosCaso: React.FC = () => {
 
   const handleDownload = async (documento: Documento) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/documentos/${documento.id}/download`);
+      const response = await fetch(API_ENDPOINTS.DOCUMENTOS.DOWNLOAD(documento.id.toString()));
       if (!response.ok) {
-        alert('Error al descargar el documento');
-        return;
+        throw new Error('Error al descargar documento');
       }
       
       const blob = await response.blob();
@@ -92,8 +95,8 @@ export const DocumentosCaso: React.FC = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Error al descargar:', error);
-      alert('Error al descargar el documento');
+      console.error('Error:', error);
+      setError('Error al descargar documento');
     }
   };
 

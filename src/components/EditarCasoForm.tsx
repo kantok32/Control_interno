@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/components.css';
+import API_ENDPOINTS from '../config/api';
 
 interface Caso {
   id: string;
@@ -50,23 +51,24 @@ export const EditarCasoForm: React.FC<EditarCasoFormProps> = ({ caso, onClose, o
   const [abogados, setAbogados] = useState<{id: number, username: string, nombre_completo: string}[]>([]);
 
   useEffect(() => {
-    const fetchAbogados = async () => {
+    const cargarAbogados = async () => {
       try {
-        const accessToken = localStorage.getItem('accessToken');
-        const response = await fetch('http://localhost:3001/api/auth/usuarios/abogados', {
+        const response = await fetch(API_ENDPOINTS.AUTH.ABOGADOS, {
           headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
-        if (response.ok) {
-          setAbogados(await response.json());
+        if (!response.ok) {
+          throw new Error('Error al cargar abogados');
         }
-      } catch (err) {
-        console.error('Error al cargar abogados:', err);
+        const data = await response.json();
+        setAbogados(data);
+      } catch (error) {
+        console.error('Error al cargar abogados:', error);
       }
     };
-    fetchAbogados();
+
+    cargarAbogados();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -92,31 +94,26 @@ export const EditarCasoForm: React.FC<EditarCasoFormProps> = ({ caso, onClose, o
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:3001/api/casos/${caso.id}`, {
+      const response = await fetch(API_ENDPOINTS.CASOS.UPDATE(caso.id), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        if (errorData.camposFaltantes) {
-          setError(
-            `Faltan los siguientes campos: ${errorData.camposFaltantes.join(', ')}`
-          );
-        } else {
-          setError(errorData.error || 'Error al actualizar el caso');
-        }
-        setLoading(false);
-        return;
+        throw new Error(errorData.message || 'Error al actualizar el caso');
       }
 
+      const result = await response.json();
       onSave();
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
+      console.error('Error al actualizar caso:', err);
     } finally {
       setLoading(false);
     }
