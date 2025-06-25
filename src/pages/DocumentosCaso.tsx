@@ -338,26 +338,15 @@ export const DocumentosCaso: React.FC = () => {
                 <td>{doc.nombre}</td>
                 <td>{doc.descripcion}</td>
                 <td>
-                  {doc.ruta_archivo && doc.ruta_archivo.endsWith('.pdf') ? (
-                    <a
-                      href={API_ENDPOINTS.FILES.GET(doc.ruta_archivo)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download
-                      style={{ color: '#3182ce', textDecoration: 'underline' }}
-                    >
-                      Descargar PDF
-                    </a>
-                  ) : (
-                    <a
-                      href={API_ENDPOINTS.FILES.GET(doc.ruta_archivo)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: '#3182ce', textDecoration: 'underline' }}
-                    >
-                      {doc.ruta_archivo ? doc.ruta_archivo.split('/').pop() : ''}
-                    </a>
-                  )}
+                  <a
+                    href={API_ENDPOINTS.FILES.GET(doc.ruta_archivo)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    style={{ color: '#3182ce', textDecoration: 'underline' }}
+                  >
+                    {doc.ruta_archivo ? doc.ruta_archivo.split('/').pop() : 'Descargar'}
+                  </a>
                 </td>
                 <td>{new Date(doc.fecha_creacion).toLocaleDateString()}</td>
                 <td>
