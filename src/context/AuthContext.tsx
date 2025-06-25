@@ -55,6 +55,53 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
+  // --- Lógica de refresco automático de token por actividad del usuario ---
+  useEffect(() => {
+    let activityTimeout: NodeJS.Timeout;
+    let refreshTimeout: NodeJS.Timeout;
+    const TOKEN_LIFETIME_MINUTES = 30; // Duración real del token en minutos
+    const REFRESH_BEFORE_EXPIRY = 60; // Segundos antes de expirar para refrescar
+
+    // Refresca el token antes de que expire
+    const scheduleRefresh = () => {
+      if (refreshTimeout) clearTimeout(refreshTimeout);
+      // Refrescar 1 minuto antes de que expire
+      refreshTimeout = setTimeout(async () => {
+        try {
+          await refreshToken();
+          scheduleRefresh(); // Reprogramar tras refrescar
+        } catch (e) {
+          // Si falla, forzar logout
+          logout();
+        }
+      }, (TOKEN_LIFETIME_MINUTES * 60 - REFRESH_BEFORE_EXPIRY) * 1000);
+    };
+
+    // Reinicia el temporizador de inactividad
+    const resetActivityTimeout = () => {
+      if (activityTimeout) clearTimeout(activityTimeout);
+      activityTimeout = setTimeout(() => {
+        // Si no hay actividad en 30 minutos, hacer logout
+        logout();
+      }, TOKEN_LIFETIME_MINUTES * 60 * 1000);
+      scheduleRefresh();
+    };
+
+    // Eventos de actividad
+    const events = ['mousemove', 'keydown', 'mousedown', 'scroll', 'touchstart'];
+    events.forEach(event => window.addEventListener(event, resetActivityTimeout));
+
+    // Iniciar timers al montar
+    resetActivityTimeout();
+
+    return () => {
+      if (activityTimeout) clearTimeout(activityTimeout);
+      if (refreshTimeout) clearTimeout(refreshTimeout);
+      events.forEach(event => window.removeEventListener(event, resetActivityTimeout));
+    };
+    // eslint-disable-next-line
+  }, [isAuthenticated, refreshTokenValue]);
+
   // ---- Función de Login ----
   const login = async (username: string, password: string) => {
     try {

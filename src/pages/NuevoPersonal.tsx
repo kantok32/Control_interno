@@ -7,7 +7,7 @@ const NuevoPersonal: React.FC = () => {
     nombre: '',
     tipo_contrato: '',
     prevision: '',
-    adp: '',
+    afp: '',
     sueldo_bruto: '',
     sueldo_liquido: '',
     inicio_contrato: '',
@@ -48,8 +48,8 @@ const NuevoPersonal: React.FC = () => {
             <input type="text" name="prevision" value={formData.prevision} onChange={handleChange} />
           </div>
           <div className="form-group">
-            <label>ADP</label>
-            <input type="text" name="adp" value={formData.adp} onChange={handleChange} />
+            <label>AFP</label>
+            <input type="text" name="afp" value={formData.afp} onChange={handleChange} />
           </div>
           <div className="form-group">
             <label>Sueldo Bruto</label>

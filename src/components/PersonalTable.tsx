@@ -6,7 +6,7 @@ interface Personal {
   nombre: string;
   tipo_contrato: string;
   prevision: string;
-  adp: string;
+  afp: string;
   sueldo_bruto: number;
   sueldo_liquido: number;
   inicio_contrato: string;
@@ -29,7 +29,7 @@ const PersonalTable: React.FC<PersonalTableProps> = ({ personal }) => {
             <th>Nombre</th>
             <th>Tipo de Contrato</th>
             <th>Previsión</th>
-            <th>ADP</th>
+            <th>AFP</th>
             <th>Sueldo Bruto</th>
             <th>Sueldo Líquido</th>
             <th>Inicio Contrato</th>
@@ -44,12 +44,12 @@ const PersonalTable: React.FC<PersonalTableProps> = ({ personal }) => {
               <td>{p.nombre}</td>
               <td>{p.tipo_contrato}</td>
               <td>{p.prevision}</td>
-              <td>{p.adp}</td>
-              <td>{p.sueldo_bruto?.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
-              <td>{p.sueldo_liquido?.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
+              <td>{p.afp}</td>
+              <td>{p.sueldo_bruto?.toLocaleString('es-CL')}</td>
+              <td>{p.sueldo_liquido?.toLocaleString('es-CL')}</td>
               <td>{p.inicio_contrato}</td>
               <td>{p.termino_contrato || '-'}</td>
-              <td>{p.bono_incorporacion?.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
+              <td>{p.bono_incorporacion?.toLocaleString('es-CL')}</td>
               <td>
                 <button className="icon-edit" title="Editar"><i className="fas fa-pencil-alt"></i></button>
                 <button className="icon-delete" title="Eliminar"><i className="fas fa-trash-alt"></i></button>

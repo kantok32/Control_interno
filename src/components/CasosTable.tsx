@@ -163,15 +163,8 @@ export const CasosTable: React.FC<CasosTableProps> = ({ casos, onCasoUpdated }) 
                 <td>{new Date(caso.fecha_apertura).toLocaleDateString()}</td>
                 <td>{caso.fecha_actualizacion ? new Date(caso.fecha_actualizacion).toLocaleDateString() : '-'}</td>
                 <td>
-                  <div className="documentos-info">
-                    <span className="documentos-count">
-                      {caso.total_documentos || 0} docs
-                    </span>
-                    {caso.ultimo_documento && (
-                      <div className="ultimo-doc">
-                        {new Date(caso.ultimo_documento).toLocaleDateString()}
-                      </div>
-                    )}
+                  <div className="documentos-info" style={{ textAlign: 'center', fontWeight: 600 }}>
+                    {caso.total_documentos || 0}
                   </div>
                 </td>
                 <td>
