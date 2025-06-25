@@ -264,42 +264,43 @@ const DocumentosPersonal: React.FC = () => {
               </td>
               <td>{new Date(doc.fecha_subida).toLocaleDateString()}</td>
               <td>
-                <button
-                  className="icon-edit"
-                  title="Editar"
-                  style={{ marginRight: 8 }}
-                  onClick={() => {
-                    setEditDoc(doc);
-                    setEditNombre(doc.nombre);
-                    setEditDescripcion(doc.descripcion || '');
-                  }}
-                >
-                  <i className="fas fa-pencil-alt"></i>
-                </button>
-                <button
-                  className="icon-delete"
-                  title="Eliminar"
-                  onClick={async () => {
-                    if (window.confirm('¿Seguro que deseas eliminar este documento?')) {
-                      if (!id) return;
-                      
-                      try {
-                        const res = await authenticatedFetch(API_ENDPOINTS.PERSONAL.DOCUMENTO(id, doc.id.toString()), {
-                          method: 'DELETE'
-                        });
-                        if (res.ok) {
-                          setDocumentos(prev => prev.filter(d => d.id !== doc.id));
-                        } else {
+                <div className="action-icons">
+                  <button
+                    className="action-btn edit"
+                    title="Editar"
+                    style={{ marginRight: 8 }}
+                    onClick={() => {
+                      setEditDoc(doc);
+                      setEditNombre(doc.nombre);
+                      setEditDescripcion(doc.descripcion || '');
+                    }}
+                  >
+                    <i className="fas fa-pencil-alt"></i>
+                  </button>
+                  <button
+                    className="action-btn delete"
+                    title="Eliminar"
+                    onClick={async () => {
+                      if (window.confirm('¿Seguro que deseas eliminar este documento?')) {
+                        if (!id) return;
+                        try {
+                          const res = await authenticatedFetch(API_ENDPOINTS.PERSONAL.DOCUMENTO(id, doc.id.toString()), {
+                            method: 'DELETE'
+                          });
+                          if (res.ok) {
+                            setDocumentos(prev => prev.filter(d => d.id !== doc.id));
+                          } else {
+                            alert('Error al eliminar el documento');
+                          }
+                        } catch {
                           alert('Error al eliminar el documento');
                         }
-                      } catch {
-                        alert('Error al eliminar el documento');
                       }
-                    }
-                  }}
-                >
-                  <i className="fas fa-trash-alt"></i>
-                </button>
+                    }}
+                  >
+                    <i className="fas fa-trash-alt"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

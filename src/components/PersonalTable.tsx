@@ -128,9 +128,11 @@ const PersonalTable: React.FC<PersonalTableProps> = ({ personal }) => {
               <td>{p.termino_contrato || '-'}</td>
               <td>{Number(p.bono_incorporacion).toLocaleString('es-CL')}</td>
               <td>
-                <button className="icon-edit" title="Editar" onClick={() => handleEdit(p)}><i className="fas fa-pencil-alt"></i></button>
-                <button className="icon-delete" title="Eliminar" onClick={() => handleDelete(p.id)}><i className="fas fa-trash-alt"></i></button>
-                <button className="icon-doc" title="Agregar Documentos" onClick={() => navigate(`/personal/${p.id}/documentos`)}><i className="fas fa-file-upload"></i></button>
+                <div className="action-icons">
+                  <button className="action-btn edit" title="Editar" onClick={() => handleEdit(p)}><i className="fas fa-pencil-alt"></i></button>
+                  <button className="action-btn delete" title="Eliminar" onClick={() => handleDelete(p.id)}><i className="fas fa-trash-alt"></i></button>
+                  <button className="action-btn doc" title="Agregar Documentos" onClick={() => navigate(`/personal/${p.id}/documentos`)}><i className="fas fa-file-upload"></i></button>
+                </div>
               </td>
             </tr>
           ))}

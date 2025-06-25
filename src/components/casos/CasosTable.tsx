@@ -63,9 +63,9 @@ export default function CasosTable() {
                   </span>
                 </td>
                 <td className="action-icons">
-                  <i className="fas fa-folder-open icon-info" title="Ver detalle/entradas"></i>
-                  <i className="fas fa-pencil-alt icon-edit" title="Editar caso"></i>
-                  <i className="fas fa-trash-alt icon-delete" title="Eliminar caso"></i>
+                  <button className="action-btn info" title="Ver detalle/entradas"><i className="fas fa-folder-open"></i></button>
+                  <button className="action-btn edit" title="Editar caso"><i className="fas fa-pencil-alt"></i></button>
+                  <button className="action-btn delete" title="Eliminar caso"><i className="fas fa-trash-alt"></i></button>
                 </td>
               </tr>
             ))}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { EditarCasoForm } from './EditarCasoForm';
 import ClienteDetalleModal from './ClienteDetalleModal';
 import API_ENDPOINTS, { authenticatedFetch } from '../config/api';
@@ -169,21 +169,13 @@ export const CasosTable: React.FC<CasosTableProps> = ({ casos, onCasoUpdated }) 
                 </td>
                 <td>
                   <div className="action-icons">
-                    <button 
-                      className="icon-info"
-                      title="Ver documentos"
-                      onClick={() => verDocumentos(caso.id)}
-                    >
+                    <button className="action-btn info" title="Ver documentos" onClick={() => verDocumentos(caso.id)}>
                       <i className="fas fa-folder-open"></i>
                     </button>
-                    <Link to={`/casos/editar/${caso.id}`} className="icon-edit" title="Editar caso">
+                    <button className="action-btn edit" title="Editar caso" onClick={() => navigate(`/casos/editar/${caso.id}`)}>
                       <i className="fas fa-pencil-alt"></i>
-                    </Link>
-                    <button 
-                      className="icon-delete"
-                      title="Eliminar caso"
-                      onClick={() => handleDelete(caso.id)}
-                    >
+                    </button>
+                    <button className="action-btn delete" title="Eliminar caso" onClick={() => handleDelete(caso.id)}>
                       <i className="fas fa-trash-alt"></i>
                     </button>
                   </div>

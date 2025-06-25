@@ -350,32 +350,34 @@ export const DocumentosCaso: React.FC = () => {
                 </td>
                 <td>{new Date(doc.fecha_creacion).toLocaleDateString()}</td>
                 <td>
-                  <button
-                    className="icon-edit"
-                    title="Editar"
-                    style={{ marginRight: 8 }}
-                    onClick={() => {
-                      setEditDoc(doc);
-                      setEditNombre(doc.nombre);
-                      setEditDescripcion(doc.descripcion || '');
-                    }}
-                  >
-                    <i className="fas fa-pencil-alt"></i>
-                  </button>
-                  <button
-                    className="icon-delete"
-                    title="Eliminar"
-                    onClick={() => handleDelete(doc.id)}
-                  >
-                    <i className="fas fa-trash-alt"></i>
-                  </button>
-                  <button
-                    className="icon-download"
-                    title="Descargar"
-                    onClick={() => handleDownload(doc)}
-                  >
-                    <i className="fas fa-download"></i>
-                  </button>
+                  <div className="action-icons">
+                    <button
+                      className="action-btn edit"
+                      title="Editar"
+                      style={{ marginRight: 8 }}
+                      onClick={() => {
+                        setEditDoc(doc);
+                        setEditNombre(doc.nombre);
+                        setEditDescripcion(doc.descripcion || '');
+                      }}
+                    >
+                      <i className="fas fa-pencil-alt"></i>
+                    </button>
+                    <button
+                      className="action-btn delete"
+                      title="Eliminar"
+                      onClick={() => handleDelete(doc.id)}
+                    >
+                      <i className="fas fa-trash-alt"></i>
+                    </button>
+                    <button
+                      className="action-btn download"
+                      title="Descargar"
+                      onClick={() => handleDownload(doc)}
+                    >
+                      <i className="fas fa-download"></i>
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))

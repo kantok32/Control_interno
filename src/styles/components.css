@@ -214,7 +214,7 @@
   justify-content: flex-start;
 }
 
-.action-icons button {
+.action-btn {
   background: none;
   border: none;
   padding: 0.5rem;
@@ -224,25 +224,16 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease-in-out;
+  font-size: 1.1rem;
 }
 
-.icon-info {
-  color: #4299e1;
-}
-
-.icon-edit {
-  color: #48bb78;
-}
-
-.icon-delete {
-  color: #f56565;
-}
-
-.icon-info:hover,
-.icon-edit:hover,
-.icon-delete:hover {
-  background-color: #f7fafc;
-}
+.action-btn.info    { color: #4299e1; }
+.action-btn.edit    { color: #48bb78; }
+.action-btn.delete  { color: #f56565; }
+.action-btn.doc     { color: #3182ce; }
+.action-btn.download{ color: #38a169; }
+.action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.action-btn:hover   { background: #f7fafc; transform: scale(1.1); }
 
 /* Estilos para FiltrosCasos */
 .filtros-container {

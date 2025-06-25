@@ -196,6 +196,32 @@ const UserManagement: React.FC = () => {
     return new Date(dateString).toLocaleString('es-CL');
   };
 
+  // Función para eliminar usuario
+  const handleDelete = async (userId: number, rol: string) => {
+    if (rol.toLowerCase() === 'admin' || rol.toLowerCase() === 'super admin') {
+      alert('No puedes eliminar usuarios con rol admin o super admin');
+      return;
+    }
+    if (!window.confirm('¿Seguro que deseas eliminar este usuario?')) return;
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      const response = await fetch(API_ENDPOINTS.AUTH.USUARIOS + `/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Error al eliminar usuario');
+      }
+      loadUsers();
+      alert('Usuario eliminado exitosamente');
+    } catch (error) {
+      alert('Error al eliminar usuario');
+    }
+  };
+
   if (loading) {
     return (
       <div className="loading">Cargando usuarios...</div>
@@ -263,15 +289,28 @@ const UserManagement: React.FC = () => {
                   </td>
                   <td>{formatDate(userItem.fecha_creacion)}</td>
                   <td className="actions">
-                    {user?.permisos.usuarios.includes('actualizar') && (
-                      <button 
-                        className="btn-edit"
-                        onClick={() => handleEdit(userItem)}
-                        title="Editar usuario"
-                      >
-                        <i className="fas fa-edit"></i>
-                      </button>
-                    )}
+                    <div className="action-icons">
+                      {user?.permisos.usuarios.includes('actualizar') && (
+                        <button 
+                          className="action-btn edit"
+                          onClick={() => handleEdit(userItem)}
+                          title="Editar usuario"
+                        >
+                          <i className="fas fa-edit"></i>
+                        </button>
+                      )}
+                      {user?.permisos.usuarios.includes('eliminar') && (
+                        <button
+                          className="action-btn delete"
+                          title="Eliminar usuario"
+                          disabled={userItem.rol_nombre.toLowerCase() === 'admin' || userItem.rol_nombre.toLowerCase() === 'super admin'}
+                          onClick={() => handleDelete(userItem.id, userItem.rol_nombre)}
+                          style={{ marginLeft: 8, opacity: (userItem.rol_nombre.toLowerCase() === 'admin' || userItem.rol_nombre.toLowerCase() === 'super admin') ? 0.5 : 1 }}
+                        >
+                          <i className="fas fa-trash-alt"></i>
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
