@@ -84,7 +84,8 @@ export const CasosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         antecedentes_penales: formData.get('antecedentes_penales') === 'true',
         abogado: formData.get('abogado'),
         prioridad: formData.get('prioridad'),
-        estado: formData.get('estado')
+        estado: formData.get('estado'),
+        rit: formData.get('rit')
       };
 
       console.log('Datos del caso a enviar:', casoData);

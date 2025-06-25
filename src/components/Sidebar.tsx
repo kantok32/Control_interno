@@ -8,8 +8,9 @@ const Sidebar = () => {
 
     return (
         <aside className="sidebar">
-            <div className="sidebar-header">
-                <img src={logo} alt="Logo Hoffmann" className="sidebar-logo" />
+            <div className="sidebar-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+                <img src={logo} alt="Logo Hoffmann" className="sidebar-logo" style={{ height: 48, marginBottom: 4 }} />
+                <span style={{ fontWeight: 700, fontSize: 15, color: '#c75b0a', letterSpacing: 1, textAlign: 'center', lineHeight: 1.1 }}>Control Interno Hoffmann</span>
             </div>
             <nav className="sidebar-nav">
                 <ul>

@@ -127,51 +127,36 @@ const NuevoCaso = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateForm = (): boolean => {
+    console.log('Iniciando validación del formulario...');
+    console.log('Datos del formulario:', formData);
+    
     const newErrors: FormErrors = {};
     
-    if (!formData.nombre_completo.trim()) {
-      newErrors.nombre_completo = 'El nombre completo es requerido';
-    }
-    if (!formData.fecha_nacimiento) {
-      newErrors.fecha_nacimiento = 'La fecha de nacimiento es requerida';
-    }
-    if (!formData.rut.trim()) {
-      newErrors.rut = 'El RUT es requerido';
-    }
-    if (!formData.correo_electronico.trim()) {
-      newErrors.correo_electronico = 'El correo electrónico es requerido';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correo_electronico)) {
+    // Todos los campos son opcionales - solo validar formato si se proporcionan
+    if (formData.correo_electronico.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correo_electronico)) {
       newErrors.correo_electronico = 'El correo electrónico no es válido';
+      console.log('Error: correo_electronico inválido');
     }
-    if (!formData.telefono.trim()) {
-      newErrors.telefono = 'El teléfono es requerido';
-    } else if (!/^\+?56?\d{9}$/.test(formData.telefono.replace(/\s+/g, ''))) {
-      newErrors.telefono = 'El teléfono debe ser un número válido de Chile (9 dígitos)';
+    
+    // Validación de teléfono - solo verificar que contenga números
+    if (formData.telefono.trim()) {
+      const telefonoLimpio = formData.telefono.replace(/\D/g, ''); // Solo números
+      if (telefonoLimpio.length === 0) {
+        newErrors.telefono = 'El teléfono debe contener al menos un número';
+        console.log('Error: telefono sin números');
+      }
     }
-    if (!formData.domicilio.trim()) {
-      newErrors.domicilio = 'El domicilio es requerido';
-    }
-    if (!formData.tipo_asesoria.trim()) {
-      newErrors.tipo_asesoria = 'El tipo de asesoría es requerido';
-    }
-    if (!formData.descripcion_asunto.trim()) {
-      newErrors.descripcion_asunto = 'La descripción del asunto es requerida';
-    }
+    
     if (formData.motivo_consulta === 'Otros' && !formData.motivo_consulta_otro?.trim()) {
       newErrors.motivo_consulta_otro = 'Debe especificar el otro motivo de consulta';
-    }
-    if (!formData.abogado) {
-      newErrors.abogado = 'Debe seleccionar un abogado';
-    }
-    if (!formData.estado) {
-      newErrors.estado = 'Debe seleccionar un estado';
-    }
-    if (!formData.rit.trim()) {
-      newErrors.rit = 'El RIT es requerido';
+      console.log('Error: motivo_consulta_otro vacío cuando motivo_consulta es "Otros"');
     }
 
+    console.log('Errores encontrados:', newErrors);
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const isValid = Object.keys(newErrors).length === 0;
+    console.log('Formulario válido:', isValid);
+    return isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -353,7 +338,7 @@ const NuevoCaso = () => {
           <div className="form-row nombre-fecha">
             <div className="form-group">
               <label htmlFor="nombre_completo">
-                Nombre Completo <span className="required">*</span>
+                Nombre Completo
               </label>
               <input
                 type="text"
@@ -363,14 +348,13 @@ const NuevoCaso = () => {
                 onChange={handleChange}
                 placeholder="Ingrese el nombre completo"
                 className={errors.nombre_completo ? 'error' : ''}
-                required
               />
               {errors.nombre_completo && <span className="error-message">{errors.nombre_completo}</span>}
             </div>
 
             <div className="form-group">
               <label htmlFor="fecha_nacimiento">
-                Fecha de Nacimiento <span className="required">*</span>
+                Fecha de Nacimiento
               </label>
               <input
                 type="date"
@@ -380,7 +364,6 @@ const NuevoCaso = () => {
                 onChange={handleChange}
                 max={fechaActual}
                 className={errors.fecha_nacimiento ? 'error' : ''}
-                required
               />
               {errors.fecha_nacimiento && <span className="error-message">{errors.fecha_nacimiento}</span>}
             </div>
@@ -389,7 +372,7 @@ const NuevoCaso = () => {
           <div className="form-row contacto">
             <div className="form-group">
               <label htmlFor="rut">
-                RUT <span className="required">*</span>
+                RUT
               </label>
               <input
                 type="text"
@@ -399,14 +382,13 @@ const NuevoCaso = () => {
                 onChange={handleChange}
                 placeholder="12.345.678-9"
                 className={errors.rut ? 'error' : ''}
-                required
               />
               {errors.rut && <span className="error-message">{errors.rut}</span>}
             </div>
 
             <div className="form-group">
               <label htmlFor="correo_electronico">
-                Correo Electrónico <span className="required">*</span>
+                Correo Electrónico
               </label>
               <input
                 type="email"
@@ -416,14 +398,13 @@ const NuevoCaso = () => {
                 onChange={handleChange}
                 placeholder="ejemplo@correo.com"
                 className={errors.correo_electronico ? 'error' : ''}
-                required
               />
               {errors.correo_electronico && <span className="error-message">{errors.correo_electronico}</span>}
             </div>
 
             <div className="form-group">
               <label htmlFor="telefono">
-                Teléfono <span className="required">*</span>
+                Teléfono
               </label>
               <input
                 type="tel"
@@ -433,7 +414,6 @@ const NuevoCaso = () => {
                 onChange={handleChange}
                 placeholder="+56912345678"
                 className={errors.telefono ? 'error' : ''}
-                required
               />
               {errors.telefono && <span className="error-message">{errors.telefono}</span>}
             </div>
@@ -454,7 +434,7 @@ const NuevoCaso = () => {
 
           <div className="form-group full-width">
             <label htmlFor="domicilio">
-              Domicilio <span className="required">*</span>
+              Domicilio
             </label>
             <input
               type="text"
@@ -464,7 +444,6 @@ const NuevoCaso = () => {
               onChange={handleChange}
               placeholder="Ingrese el domicilio completo"
               className={errors.domicilio ? 'error' : ''}
-              required
             />
             {errors.domicilio && <span className="error-message">{errors.domicilio}</span>}
           </div>
@@ -475,7 +454,7 @@ const NuevoCaso = () => {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="tipo_asesoria">
-                Tipo de Asesoría <span className="required">*</span>
+                Tipo de Asesoría
               </label>
               <select
                 id="tipo_asesoria"
@@ -513,7 +492,7 @@ const NuevoCaso = () => {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="motivo_consulta">
-                Motivo de la Consulta <span className="required">*</span>
+                Motivo de la Consulta
               </label>
               <select
                 id="motivo_consulta"
@@ -534,7 +513,7 @@ const NuevoCaso = () => {
             {formData.motivo_consulta === 'Otros' && (
               <div className="form-group">
                 <label htmlFor="motivo_consulta_otro">
-                  Especifique el motivo <span className="required">*</span>
+                  Especifique el motivo
                 </label>
                 <input
                   type="text"
@@ -552,7 +531,7 @@ const NuevoCaso = () => {
 
           <div className="form-group">
             <label htmlFor="descripcion_asunto">
-              Descripción breve del asunto <span className="required">*</span>
+              Descripción breve del asunto
             </label>
             <textarea
               id="descripcion_asunto"
@@ -587,7 +566,7 @@ const NuevoCaso = () => {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="abogado">
-                Abogado Asignado <span className="required">*</span>
+                Abogado Asignado
               </label>
               <select
                 id="abogado"
@@ -622,7 +601,7 @@ const NuevoCaso = () => {
 
             <div className="form-group">
               <label htmlFor="estado">
-                Estado <span className="required">*</span>
+                Estado
               </label>
               <select
                 id="estado"
