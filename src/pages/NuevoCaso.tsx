@@ -176,9 +176,14 @@ const NuevoCaso = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('handleSubmit ejecutado');
+    
     if (!validateForm()) {
+      console.log('Validación falló, no se envía el formulario');
       return;
     }
+    
+    console.log('Validación exitosa, enviando formulario...');
     setIsSubmitting(true);
     try {
       const formDataToSend = new FormData();
@@ -214,7 +219,9 @@ const NuevoCaso = () => {
         formDataToSend.append('archivos', file);
       });
 
+      console.log('Llamando a agregarCaso...');
       await agregarCaso(formDataToSend);
+      console.log('Caso creado exitosamente, redirigiendo...');
       navigate('/casos');
     } catch (error) {
       console.error('Error al crear el caso:', error);

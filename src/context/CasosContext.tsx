@@ -66,6 +66,8 @@ export const CasosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setLoading(true);
     setError(null);
     try {
+      console.log('Iniciando creación de caso...');
+      
       // Crear el objeto con los datos del caso usando la nueva estructura
       const casoData = {
         nombre_completo: formData.get('nombre_completo'),
@@ -85,22 +87,29 @@ export const CasosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         estado: formData.get('estado')
       };
 
+      console.log('Datos del caso a enviar:', casoData);
+
       const responseCaso = await authenticatedFetch(API_ENDPOINTS.CASOS.CREATE, {
         method: 'POST',
         body: JSON.stringify(casoData)
       });
 
+      console.log('Respuesta del servidor:', responseCaso.status, responseCaso.statusText);
+
       if (!responseCaso.ok) {
         const errorData = await responseCaso.json();
+        console.error('Error del servidor:', errorData);
         throw new Error(errorData.message || 'Error al crear el caso');
       }
 
       const resultCaso = await responseCaso.json();
+      console.log('Caso creado exitosamente:', resultCaso);
       const casoId = resultCaso.id;
 
       // Luego subimos los documentos si existen
       const archivos = formData.getAll('archivos');
       if (archivos.length > 0) {
+        console.log('Subiendo archivos...');
         for (const archivo of archivos) {
           if (archivo instanceof File) {
             const docFormData = new FormData();
@@ -125,7 +134,7 @@ export const CasosProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // Recargar la lista de casos
       await cargarCasos();
       
-      return resultCaso.caso;
+      return resultCaso;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error al agregar caso:', err);

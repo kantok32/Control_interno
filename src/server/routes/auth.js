@@ -331,4 +331,29 @@ router.get('/usuarios/abogados', authenticateToken, requireRole(['SUPER_ADMIN', 
   }
 });
 
+// Eliminar usuario (solo ADMIN y SUPER_ADMIN)
+router.delete('/usuarios/:id', 
+  authenticateToken, 
+  requireRole(['SUPER_ADMIN', 'ADMIN']),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      // Evitar que un usuario se elimine a sí mismo
+      if (parseInt(id) === req.user.id) {
+        return res.status(400).json({ error: 'No puedes eliminar tu propio usuario.' });
+      }
+      const [result] = await pool.query('DELETE FROM usuarios WHERE id = ?', [id]);
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
+      // Registrar auditoría
+      await logAuditoria(req.user.id, 'ELIMINAR_USUARIO', 'usuarios', id, null, null, req);
+      res.json({ message: 'Usuario eliminado exitosamente' });
+    } catch (error) {
+      console.error('Error al eliminar usuario:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+);
+
 export default router; 

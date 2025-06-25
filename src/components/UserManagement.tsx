@@ -259,7 +259,6 @@ const UserManagement: React.FC = () => {
                 <th>Nombre Completo</th>
                 <th>Email</th>
                 <th>Rol</th>
-                <th>Estado</th>
                 <th>Último Acceso</th>
                 <th>Fecha Creación</th>
                 <th>Acciones</th>
@@ -274,11 +273,6 @@ const UserManagement: React.FC = () => {
                   <td>
                     <span className={`role-badge ${userItem.rol_nombre.toLowerCase()}`}>
                       {userItem.rol_nombre}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`status-badge ${userItem.activo ? 'active' : 'inactive'}`}>
-                      {userItem.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
                   <td>
