@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_ENDPOINTS, { authenticatedFetch } from '../config/api';
 
 const NuevoPersonal: React.FC = () => {
   const navigate = useNavigate();
@@ -20,11 +21,27 @@ const NuevoPersonal: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: enviar datos al backend
-    alert('Personal agregado (simulado)');
-    navigate('/personal');
+    try {
+      const response = await authenticatedFetch(API_ENDPOINTS.PERSONAL.CREATE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message || 'Personal agregado correctamente');
+        navigate('/personal');
+      } else {
+        const errorData = await response.json();
+        alert('Error al agregar personal: ' + (errorData.error || 'Error desconocido'));
+      }
+    } catch (error) {
+      alert('Error al conectar con el servidor');
+    }
   };
 
   return (

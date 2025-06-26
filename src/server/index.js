@@ -94,6 +94,35 @@ app.use('/uploads', express.static(join(__dirname, '../../uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/personal', personalRoutes);
 
+// Crear nuevo personal
+app.post('/api/personal', async (req, res) => {
+  try {
+    const {
+      nombre,
+      tipo_contrato,
+      prevision,
+      afp,
+      sueldo_bruto,
+      sueldo_liquido,
+      inicio_contrato,
+      termino_contrato,
+      bono_incorporacion
+    } = req.body;
+
+    const [result] = await pool.query(
+      `INSERT INTO personal_documentacion 
+      (nombre, tipo_contrato, prevision, afp, sueldo_bruto, sueldo_liquido, inicio_contrato, termino_contrato, bono_incorporacion)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [nombre, tipo_contrato, prevision, afp, sueldo_bruto, sueldo_liquido, inicio_contrato, termino_contrato, bono_incorporacion]
+    );
+
+    res.status(201).json({ id: result.insertId, message: 'Personal creado correctamente' });
+  } catch (error) {
+    console.error('Error al crear personal:', error);
+    res.status(500).json({ error: 'Error al crear personal' });
+  }
+});
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST || '192.140.56.40',
   user: process.env.DB_USER || 'invers26_claudio_m1',
